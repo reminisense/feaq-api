@@ -14,3 +14,15 @@
 $app->get('/', function () use ($app) {
     return $app->welcome();
 });
+
+// Broadcast API routes
+$app->get('broadcast/{raw_code}', 'BroadcastController@getDetails');
+
+// Advertisement API routes
+$app->get('advertisement/{business_id}', 'AdvertisementController@getImages');
+
+// IssueNumber API routes
+$app->post('issuenumber/insert-specific', 'IssueNumberController@postInsertSpecific');
+
+// User Profile API routes
+$app->get('user/{user_id}', 'UserController@getProfile');
