@@ -16,13 +16,13 @@ $app->get('/', function () use ($app) {
 });
 
 // Broadcast API routes
-$app->get('broadcast/{raw_code}', 'BroadcastController@getDetails');
+$app->get('broadcast/{raw_code}', 'BroadcastController@fetchDetails');
 
 // Advertisement API routes
-$app->get('advertisement/{business_id}', 'AdvertisementController@getImages');
+$app->get('advertisement/{business_id}', 'AdvertisementController@fetchImages');
 
 // IssueNumber API routes
 $app->post('issuenumber/insert-specific', 'IssueNumberController@postInsertSpecific');
 
 // User Profile API routes
-$app->get('user/{user_id}', 'UserController@getProfile');
+$app->get('user/{user_id}', 'UserController@fetchProfile');

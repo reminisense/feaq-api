@@ -15,7 +15,7 @@ class AdImages extends Model
     AdImages::where('img_id', '=', $img_id)->update(array('weight' => $weight));
   }
 
-  public static function getAllImagesByBusinessId($business_id) {
+  public static function fetchAllImagesByBusinessId($business_id) {
     return AdImages::where('business_id', '=', $business_id)->orderBy('weight')->get();
   }
 

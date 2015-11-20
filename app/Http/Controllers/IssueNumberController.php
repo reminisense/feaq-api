@@ -16,6 +16,59 @@ use App\Models\Terminal;
 
 class IssueNumberController extends Controller {
 
+  /**
+   * @api {post} issuenumber/insert-specific Inserts Specific Number
+   * @apiName PostInsertSpecific
+   * @apiGroup IssueNumber
+   * @apiVersion 1.0.0
+   * @apiExample {js} Example Usage:
+   *     https://api.featherq.com/issuenumber/insert-specific
+   * @apiDescription This function enables the authorized user to queue by inserting the validated number to the database.
+   *
+   * @apiHeader {String} access-key The unique access key sent by the client.
+   * @apiPermission Authenticated User
+   *
+   * @apiParam {Number} service_id The id of the service to queue.
+   * @apiParam {Number} terminal_id The id of the terminal to queue.
+   * @apiParam {String} queue_platform The platform where the queue is requested.
+   * @apiParam {String} priority_number The generated priority number.
+   * @apiParam {String} name The full name of the user that is queuing.
+   * @apiParam {String} phone The contact number of the user that is queuing.
+   * @apiParam {String} email The email address of the user that is queuing.
+   * @apiParam {String} date The timestamp format of the date the queue is requested.
+   * @apiParam {String} user_id The id of the user requesting the queue.
+   * @apiParam {String} time_assigned The time on which the queue was inserted to the database.
+   *
+   * @apiSuccess (Success 200) {String} success The boolean flag of the successful process.
+   * @apiSuccess (Success 200) {String[]} number An array containing the information about the current transaction.
+   * @apiSuccess (Success 200) {String} transaction_number The id of the current transaction.
+   * @apiSuccess (Success 200) {String} priority_number The number given to the user.
+   * @apiSuccess (Success 200) {String} confirmation_code The code given to the user along with the priority number for validation.
+   * @apiSuccessExample {Json} Success-Response:
+   *     HTTP/1.1 200 OK
+   *     [
+   *       {
+   *          "success": 1
+   *       },
+   *       {
+   *         "transaction_number": 73123122,
+   *         "priority_number": "21",
+   *         "confirmation_code": 1GHB3JS987
+   *       },
+   *     ]
+   *
+   * @apiError (Error 404) {String} TransactionInvalid The <code>TransactionInvalid</code> is null.
+   * @apiErrorExample {Json} Error-Response:
+   *     HTTP/1.1 404 Not Found
+   *     [
+   *       {
+   *          "success": 0
+   *       },
+   *       {
+   *         "err_message": "TransactionInvalid"
+   *       },
+   *     ]
+   */
   public function postInsertSpecific(){
     $service_id = Input::get('service_id');
     $terminal_id = Input::get('terminal_id');
@@ -29,9 +82,15 @@ class IssueNumberController extends Controller {
     $time_assigned = Input::get('time_assigned');
     //$number = ProcessQueue::issueNumber($service_id, $priority_number, null, $queue_platform, $terminal_id);
     $number = $this->issueNumber($service_id, $priority_number, $date, $queue_platform, $terminal_id, $user_id);
-    PriorityQueue::updatePriorityQueueUser($number['transaction_number'], $name, $phone, $email);
-    TerminalTransaction::where('transaction_number', '=', $number['transaction_number'])->update(['time_assigned' => $time_assigned]);
-    return json_encode(['success' => 1, 'number' => $number]);
+    if ($number) {
+      PriorityQueue::updatePriorityQueueUser($number['transaction_number'], $name, $phone, $email);
+      TerminalTransaction::where('transaction_number', '=', $number['transaction_number'])
+        ->update(['time_assigned' => $time_assigned]);
+      return json_encode(['success' => 1, 'number' => $number]);
+    }
+    else {
+      return json_encode(['success' => 0, 'err_message' => "TransactionInvalid"]);
+    }
   }
 
   private function issueNumber($service_id, $priority_number = null, $date = null, $queue_platform = 'web', $terminal_id = 0, $user_id = null){
