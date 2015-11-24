@@ -47,7 +47,7 @@ class AdvertisementController extends Controller {
    *       "err_message": "NoImagesFound"
    *     }
    */
-  public function fetchImages($business_id = 0) {
+  public function getImages($business_id = 0) {
     $ad_images = AdImages::fetchAllImagesByBusinessId($business_id);
     if ($ad_images) {
       return $ad_images;

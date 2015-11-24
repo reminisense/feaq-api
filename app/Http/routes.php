@@ -16,10 +16,10 @@ $app->get('/', function () use ($app) {
 });
 
 // Broadcast API routes
-$app->get('broadcast/{raw_code}', 'BroadcastController@fetchDetails');
+$app->get('broadcast/{raw_code}', 'BroadcastController@getDetails');
 
 // Advertisement API routes
-$app->get('advertisement/{business_id}', 'AdvertisementController@fetchImages');
+$app->get('advertisement/{business_id}', 'AdvertisementController@getImages');
 
 // IssueNumber API routes
 $app->post('issuenumber/insert-specific', 'IssueNumberController@postInsertSpecific');
