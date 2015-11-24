@@ -27,6 +27,7 @@ class AuthenticationController extends Controller
      * @apiPermission none
      *
      * @apiParam {String} fb_id User's facebook id provided by the Facebook javascript api
+     * @apiParam {String} click_source the button where the user logged in to featherq
      *
      * @apiSuccess (Success 200) {String} success The status of the request
      * @apiSuccess (Success 200) {String} accessToken The accessKey to remember the session
@@ -48,7 +49,7 @@ class AuthenticationController extends Controller
      *
      */
     public function login(){
-        return Authentication::login(Input::get('fb_id'));
+        return Authentication::login(Input::get('fb_id'), Input::get('click_source'));
     }
 
     /**
@@ -94,6 +95,7 @@ class AuthenticationController extends Controller
      * @apiParam {String} last_name User's last name (provided by the Facebook javascript api)
      * @apiParam {String} email User's email (provided by the Facebook javascript api)
      * @apiParam {String} gender User's gender (provided by the Facebook javascript api)
+     * @apiParam {String} click_source the button where the user logged in to featherq
      *
      * @apiSuccess (Success 200) {String} success The status of the request
      * @apiSuccess (Success 200) {String} accessToken The accessKey to remember the session

@@ -25,23 +25,27 @@ class Authentication extends Model{
                 'last_name' => $post->last_name,
                 'email' => $post->email,
                 'gender' => $post->gender,
+                'click_source' => $post->click_source
             );
 
             if(!User::checkFBUser($post->fb_id)){
                 User::saveFBDetails($values);
+                Watchdog::createRecord(['action_type' => 'authentication', 'value' => serialize(['action'=> 'signup', 'success' => true,'click_source' => $post->click_source])]); //save to watchdog the source of login
             }
 
-            return Authentication::login($values['fb_id']);
+            return Authentication::login($values['fb_id'], $values['click_source']);
         }
     }
 
-    public static function login($fb_id){
+    public static function login($fb_id, $click_source){
         if(User::checkFBUser($fb_id)){
             //@todo generate access token
             $accessToken = '';
             Session::put('accessToken', $accessToken);
+            Watchdog::createRecord(['action_type' => 'authentication', 'value' => serialize(['action'=> 'login', 'success' => true, 'click_source' => $click_source])]); //save to watchdog the source of login
             return json_encode(['success' => 1, 'accessToken' => $accessToken]);
         }else{
+            Watchdog::createRecord(['action_type' => 'authentication', 'value' => serialize(['action'=> 'login', 'success' => false, 'click_source' => $click_source])]); //save to watchdog the source of login
             return json_encode(['success' => 0, 'error' => 'Please sign up to Featherq']);
         }
     }
