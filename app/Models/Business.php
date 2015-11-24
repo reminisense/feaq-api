@@ -86,10 +86,10 @@ class Business extends Model{
     public static function searchBusiness($get){
         $values = [
             'keyword'   => isset($_GET['name']) ? $_GET['name'] : '',
-            'country'   => isset($_GET['country']) ? $_GET['country'] : 'Philippines',
             'industry'  => isset($_GET['industry']) ? $_GET['industry'] : '',
-            'time_open' => isset($_GET['time_open']) ? $_GET['time_open'] : null,
-            'timezone'  => isset($_GET['user_timezone']) ? $_GET['user_timezone'] : 'Asia/Manila',
+            'country'   => isset($_GET['country']) && $_GET['country'] != '' ? $_GET['country'] : 'Philippines',
+            'time_open' => isset($_GET['time_open']) && $_GET['time_open'] != '' ? $_GET['time_open'] : null,
+            'timezone'  => isset($_GET['user_timezone']) && $_GET['timezone'] != '' ? $_GET['user_timezone'] : 'Asia/Manila',
             'limit'     => isset($_GET['limit']) && $_GET['limit'] != '' ? (int) $_GET['limit'] : 8,
             'offset'    => isset($_GET['offset']) && $_GET['offset'] != '' ? (int) $_GET['offset'] : 0,
         ];
