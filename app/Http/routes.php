@@ -14,11 +14,11 @@
 $app->get('branch', 'BranchController@getTest');
 
 //Authentication routes
-$app->post('user/register', 'AuthController@register');
+$app->post('user/register', 'AuthenticationController@register');
 
-$app->post('login', 'AuthController@login');
+$app->post('login', 'AuthenticationController@login');
 
-$app->get('logout', 'AuthController@logout');
+$app->get('logout', 'AuthenticationController@logout');
 
 //Dashboard routes
 $app->get('business/search-suggestions/{keyword}', 'BusinessController@searchSuggest');
