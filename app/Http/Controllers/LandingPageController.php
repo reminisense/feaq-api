@@ -16,57 +16,57 @@ class LandingPageController extends Controller
 
 
     /**
-     * @api {post} business/{search_param} Fetch businesses according to given search parameters.
+     * @api {post} business/search Fetch businesses.
      * @apiName Business Search
      * @apiGroup Business
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
-     *     https://api.featherq.com/business/<???>
+     *     https://api.featherq.com/business/search
      * @apiDescription Fetch businesses according to given search parameters.
      *
-     * @apiHeader {String} access-key The unique access key sent by the client. TODO
-     * @apiPermission Business Owner TODO
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Business Owner
      *
-     * @apiParam {Number} business_id The id of the business. TODO
+     * @apiParam {String} country The country where business operates.
+     * @apiParam {String} industry The industry where the business belongs to.
+     * @apiParam {String} keyword The keyword to search.
+     * @apiParam {Number} latitude Geolocation latitude.
+     * @apiParam {Number} longitude Geolocation longitude.
+     * @apiParam {Number} time_open The id of the business.
+     * @apiParam {Number} time_open The id of the business.
      *
-     * @apiSuccess (Success 200) {String} list of businesses matching search parameters.
-     * @apiSuccessExample {Json} Success-Response: TODO
-     *     HTTP/1.1 200 OK
-     *     [
-     *       {
-     *         "img_id": 72,
-     *         "path": "ads\/125\/o_1a2pute0r17ns1fi91p8q1vj6ric.jpg",
-     *         "weight": 19,
-     *         "business_id": 125
-     *       },
-     *       {
-     *         "img_id": 74,
-     *         "path": "ads\/125\/o_1a2pute0rmt3nm7f5o10927tue.png",
-     *         "weight": 21,
-     *         "business_id": 125
-     *       }
-     *     ]
      *
-     * @apiError (Error 404) {String} NoImagesFound The <code>NoImagesFound</code> is null.
-     * @apiErrorExample {Json} Error-Response:
-     *     HTTP/1.1 404 Not Found
+     * @apiSuccess (200) {Array} list of businesses matching search parameters.
+     * @apiSuccessExample {Json} Success-Response:
+     *     [{
+     *          "business_id": 9,
+     *          "business_name": "ABCDEF",
+     *          "local_address": "Cebu City, Central Visayas, Philippines",
+     *          "time_open": "12:00 AM",
+     *          "time_close": "8:00 AM",
+     *          "waiting_time": "light",
+     *          "last_number_called": "none",
+     *          "next_available_number": 1,
+     *          "last_active": 270.33333333333,
+     *          "card_bool": false
+     *     },
      *     {
-     *       "err_message": "NoImagesFound"
-     *     }
+     *          "business_id": 10,
+     *          "business_name": "Logitech Gaming",
+     *          "local_address": "Cebu City, Central Visayas, Philippines",
+     *          "time_open": "8:00 AM",
+     *          "time_close": "10:00 PM",
+     *          "waiting_time": "light",
+     *          "last_number_called": "none",
+     *          "next_available_number": 1,
+     *          "last_active": 138.33333333333,
+     *          "card_bool": false
+     *      }]
+     *
      */
     public function search() {
-
+        // TODO need to optimize this!! very very slow. :(
         $search_param = Input::all();
-
-        $country = Input::get('country');
-        $industry = Input::get('industry');
-        $keyword = Input::get('keyword');
-        $latitude = Input::get('latitude');
-        $longitude = Input::get('longitude');
-        $time_open = Input::get('time_open');
-        $user_timezone = Input::get('user_timezone');
-
-
         return Business::searchBusiness($search_param);
     }
 }
