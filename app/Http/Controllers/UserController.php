@@ -73,25 +73,63 @@ class UserController extends Controller
     }
 
     /**
-     * TODO API comments
-     * @return string
+     * @api {get} user/{user_id} Update user information
+     * @apiName UpdateUserInfo
+     * @apiGroup User
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/user/update
+     * @apiDescription Update user information.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Current User & Admin
+     *
+     * @apiParam {Number} user_id The id of the user.
+     * @apiParam {Number} modified first name of user.
+     * @apiParam {Number} modified last name of user.
+     * @apiParam {Number} modified contact number of user.
+     * @apiParam {Number} modified address of user.
+     *
+     * @apiSuccess (Success 200) {String} result.
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *          "result" : 1
+     *      }
+     *
+     * @apiError (Error 404) {Object} result 0
+     * @apiError (Error 404) {Object} error message
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *          "result": "0",
+     *          "error": "User not found!"
+     *     }
      */
     public function updateUser()
     {
         $userData = Input::all();
         $user = User::find($userData['user_id']);
+        if (is_null($user)) {
+            return json_encode([
+                'result' => 0,
+                'error' => 'User not found!'
+            ]);
+        }
+
         $user->first_name = $userData['edit_first_name'];
         $user->last_name = $userData['edit_last_name'];
         $user->phone = $userData['edit_mobile'];
         $user->local_address = $userData['edit_user_location'];
 
+
         if ($user->save()) {
             return json_encode([
-                'success' => 1,
+                'result' => 1
             ]);
         } else {
             return json_encode([
-                'success' => 0,
+                'result' => 0,
                 'error' => 'Something went wrong while trying to save your profile.'
             ]);
         }
