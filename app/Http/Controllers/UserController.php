@@ -73,7 +73,7 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} user/{user_id} Update user information
+     * @api {get} user/update Update user information
      * @apiName UpdateUserInfo
      * @apiGroup User
      * @apiVersion 1.0.0
