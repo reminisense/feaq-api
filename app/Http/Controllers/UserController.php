@@ -90,15 +90,15 @@ class UserController extends Controller
      * @apiParam {Number} modified contact number of user.
      * @apiParam {Number} modified address of user.
      *
-     * @apiSuccess (Success 200) {String} result.
+     * @apiSuccess (200) {String} result.
      * @apiSuccessExample {Json} Success-Response:
      *     HTTP/1.1 200 OK
      *     {
      *          "result" : 1
      *      }
      *
-     * @apiError (Error 404) {Object} result 0
-     * @apiError (Error 404) {Object} error message
+     * @apiError (200) {Object} result 0
+     * @apiError (200) {Object} error message
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
