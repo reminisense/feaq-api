@@ -266,6 +266,10 @@ class Business extends Model
             ->get();
     }
 
+    public static function businessExistsByRawCode($raw_code = '') {
+        return Business::where('raw_code', '=', $raw_code)->exists();
+    }
+
     public static function deleteBusinessByBusinessId($business_id)
     {
         Business::where('business_id', '=', $business_id)->delete();

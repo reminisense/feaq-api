@@ -19,6 +19,10 @@ class AdImages extends Model
     return AdImages::where('business_id', '=', $business_id)->orderBy('weight')->get();
   }
 
+  public static function imageExistsByBusinessId($business_id) {
+    return AdImages::where('business_id', '=', $business_id)->exists();
+  }
+
   public static function deleteImage($img_id) {
     AdImages::where('img_id', '=', $img_id)->delete();
   }

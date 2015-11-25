@@ -14,7 +14,7 @@ class UserController extends Controller
 {
 
   /**
-   * @api {get} user/{user_id} Fetch All The Details & Information of the User
+   * @api {get} user/{user_id} Fetch all User Details
    * @apiName FetchUserProfile
    * @apiGroup User
    * @apiVersion 1.0.0
@@ -38,14 +38,14 @@ class UserController extends Controller
    *     HTTP/1.1 200 OK
    *     {
    *       "user_id": "13",
-   *       "email": "paulgutib@outlook.com",
-   *       "first_name": "Paul Andrew \"Wizard of Love\"",
-   *       "last_name": "Gutib",
-   *       "phone": "9865478",
-   *       "local_address": "Busay, Cebu City, Central Visayas, Philippines"
+   *       "email": "foo@example.com",
+   *       "first_name": "Foo Foo",
+   *       "last_name": "Example",
+   *       "phone": "1234567890",
+   *       "local_address": "Disneyland, Hongkong"
    *     }
    *
-   * @apiError (Error 404) {String} NoUserFound The <code>NoUserFound</code> is null.
+   * @apiError (Error 404) {String} NoUserFound There were no users found with the given <code>user_id</code>.
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 404 Not Found
    *     {

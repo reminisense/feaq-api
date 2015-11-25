@@ -21,8 +21,8 @@ $app->get('broadcast/{raw_code}', 'BroadcastController@getDetails');
 // Advertisement API routes
 $app->get('advertisement/{business_id}', 'AdvertisementController@getImages');
 
-// IssueNumber API routes
-$app->post('issuenumber/insert-specific', 'IssueNumberController@postInsertSpecific');
+// Queue API routes
+$app->post('queue/insert-specific', 'QueueController@postInsertSpecific');
 
 // User Profile API routes
 $app->get('user/{user_id}', 'UserController@fetchProfile');

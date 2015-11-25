@@ -6,7 +6,7 @@ use App\Models\AdImages;
 class AdvertisementController extends Controller {
 
   /**
-   * @api {get} advertisement/{business_id} Fetch All Image Ads of the Business
+   * @api {get} advertisement/{business_id} Fetch all the Business Image Ads
    * @apiName FetchAdvertisementImage
    * @apiGroup Advertisement
    * @apiVersion 1.0.0
@@ -40,7 +40,7 @@ class AdvertisementController extends Controller {
    *       }
    *     ]
    *
-   * @apiError (Error 404) {String} NoImagesFound The <code>NoImagesFound</code> is null.
+   * @apiError (Error 404) {String} NoImagesFound No Images were found using the <code>business_id</code>.
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 404 Not Found
    *     {
@@ -48,8 +48,8 @@ class AdvertisementController extends Controller {
    *     }
    */
   public function getImages($business_id = 0) {
-    $ad_images = AdImages::fetchAllImagesByBusinessId($business_id);
-    if ($ad_images) {
+    if (AdImages::imageExistsByBusinessId($business_id)) {
+      $ad_images = AdImages::fetchAllImagesByBusinessId($business_id);
       return $ad_images;
     }
     else {

@@ -11,7 +11,7 @@ class BroadcastController extends Controller
 {
 
   /**
-   * @api {get} broadcast/{raw_code} Fetch All The Broadcast Data of the Business
+   * @api {get} broadcast/{raw_code} Fetch all the Business Broadcast Data
    * @apiName FetchBroadcastDetails
    * @apiGroup Broadcast
    * @apiVersion 1.0.0
@@ -21,7 +21,7 @@ class BroadcastController extends Controller
    * @apiDescription Gets all the needed data to make the broadcast page functional.
    *
    * @apiHeader {String} access-key The unique access key sent by the client.
-   * @apiPermission Authenticated & Anonymous Users
+   * @apiPermission none
    *
    * @apiParam {String} raw_code The 4 digit code or the personalized url of the business.
    *
@@ -92,19 +92,19 @@ class BroadcastController extends Controller
    *       "ticker_message2": "Yes",
    *       "ticker_message3": "Toast",
    *       "ticker_message4": "",
-   *       "ticker_message5": "",
+   *       "ticker_message5": "Yum",
    *       "open_hour": 3,
    *       "open_minute": 0,
    *       "open_ampm": "AM",
    *       "close_hour": 4,
    *       "close_minute": 0,
    *       "close_ampm": "PM",
-   *       "local_address": "Fuente Osme\u00f1a Circle, Cebu City, Central Visayas, Philippines",
-   *       "business_name": "Paul's Putohan",
+   *       "local_address": "Disneyland, Hongkong",
+   *       "business_name": "Foo Example",
    *       "first_service": {
    *         "service_id": 125,
    *         "code": "",
-   *         "name": "Paul's Putohan Service",
+   *         "name": "Foo Example Service",
    *         "status": 1,
    *         "time_created": "2015-07-22 07:56:43",
    *         "branch_id": 125,
@@ -116,7 +116,7 @@ class BroadcastController extends Controller
    *       ]
    *     }
    *
-   * @apiError (Error 404) {String} NoBusinessFound The <code>NoBusinessFound</code> is null.
+   * @apiError (Error 404) {String} NoBusinessFound No Businesses were found using the <code>raw_code</code>.
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 404 Not Found
    *     {
@@ -124,8 +124,8 @@ class BroadcastController extends Controller
    *     }
    */
   public function getDetails($raw_code = '') {
-    $business_id = Business::getBusinessIdByRawCode($raw_code);
-    if ($business_id) {
+    if (Business::businessExistsByRawCode($raw_code)) {
+      $business_id = Business::getBusinessIdByRawCode($raw_code);
       //$data = json_decode(file_get_contents(public_path() . '/json/' . $business_id . '.json'));
       $data = BroadcastSettings::fetchAllSettingsByBusiness($business_id);
       $business_name = Business::name($business_id);

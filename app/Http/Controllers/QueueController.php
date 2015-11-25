@@ -13,13 +13,14 @@ use App\Models\QueueSettings;
 use App\Models\PriorityNumber;
 use App\Models\TerminalTransaction;
 use App\Models\Terminal;
+use Illuminate\Support\Facades\Input;
 
-class IssueNumberController extends Controller {
+class QueueController extends Controller {
 
   /**
    * @api {post} issuenumber/insert-specific Inserts Specific Number
    * @apiName PostInsertSpecific
-   * @apiGroup IssueNumber
+   * @apiGroup Queue
    * @apiVersion 1.0.0
    * @apiExample {js} Example Usage:
    *     https://api.featherq.com/issuenumber/insert-specific
@@ -57,7 +58,7 @@ class IssueNumberController extends Controller {
    *       },
    *     ]
    *
-   * @apiError (Error 404) {String} TransactionInvalid The <code>TransactionInvalid</code> is null.
+   * @apiError (Error 404) {String} TransactionInvalid The transaction is invalid.
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 404 Not Found
    *     [
@@ -126,7 +127,7 @@ class IssueNumberController extends Controller {
   }
 
   private function getServiceProperties($service_id, $date = null){
-    $properties = new stdClass();
+    $properties = new \stdClass();
     $properties->number_start = QueueSettings::numberStart($service_id, $date);
     $properties->number_limit = QueueSettings::numberLimit($service_id, $date);
     $properties->last_number_given = $this->lastNumberGiven($service_id, $date);
