@@ -32,17 +32,17 @@ class BusinessController extends Controller
      * @apiParam {Number} [limit] The number of entries to be retrieved
      * @apiParam {Number} [offset] The number where the entries retrieved will start
      *
-     * @apiSuccess (Success 200) {Object} arr Array of objects with business details
-     * @apiSuccess (Success 200) {Number} arr.business_id The business id of the business in the database
-     * @apiSuccess (Success 200) {String} arr.business_name The name of the business
-     * @apiSuccess (Success 200) {String} arr.local_address The address of the business
-     * @apiSuccess (Success 200) {String} arr.time_open The time that the business opens
-     * @apiSuccess (Success 200) {String} arr.time_close The time that the business closes
-     * @apiSuccess (Success 200) {String} arr.waiting_time Indicates how heavy the queue is based on time it takes for the last number in the queue to be called
-     * @apiSuccess (Success 200) {Number} arr.last_number_called The last number called by the business
-     * @apiSuccess (Success 200) {Number} arr.next_available_number The next number that can be placed to the queue
-     * @apiSuccess (Success 200) {Number} arr.last_active The number of days when the business last processed the queue
-     * @apiSuccess (Success 200) {Bool} arr.card_bool Indicates if the business is active or not
+     * @apiSuccess (200) {Object} business Array of objects with business details
+     * @apiSuccess (200) {Number} business.business_id The business id of the business in the database
+     * @apiSuccess (200) {String} business.business_name The name of the business
+     * @apiSuccess (200) {String} business.local_address The address of the business
+     * @apiSuccess (200) {String} business.time_open The time that the business opens
+     * @apiSuccess (200) {String} business.time_close The time that the business closes
+     * @apiSuccess (200) {String} business.waiting_time Indicates how heavy the queue is based on time it takes for the last number in the queue to be called
+     * @apiSuccess (200) {Number} business.last_number_called The last number called by the business
+     * @apiSuccess (200) {Number} business.next_available_number The next number that can be placed to the queue
+     * @apiSuccess (200) {Number} business.last_active The number of days when the business last processed the queue
+     * @apiSuccess (200) {Bool} business.card_bool Indicates if the business is active or not
      *
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK
@@ -63,8 +63,8 @@ class BusinessController extends Controller
      *
      */
     public function search(){
-        $arr = Business::searchBusiness($_GET);
-        return json_encode($arr);
+        $business = Business::searchBusiness($_GET);
+        return json_encode($business);
     }
 
     /**
@@ -81,9 +81,9 @@ class BusinessController extends Controller
      *
      * @apiParam {String} [keyword] The keyword used to search for the business
      *
-     * @apiSuccess (Success 200) {Object} arr Array of objects with business details
-     * @apiSuccess (Success 200) {String} arr.business_name The name of the business
-     * @apiSuccess (Success 200) {String} arr.local_address The address of the business
+     * @apiSuccess (200) {Object} arr Array of objects with business details
+     * @apiSuccess (200) {String} arr.business_name The name of the business
+     * @apiSuccess (200) {String} arr.local_address The address of the business
      *
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK

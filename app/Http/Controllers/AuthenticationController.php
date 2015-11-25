@@ -29,8 +29,8 @@ class AuthenticationController extends Controller
      * @apiParam {String} fb_id User's facebook id provided by the Facebook javascript api
      * @apiParam {String} click_source the button where the user logged in to featherq
      *
-     * @apiSuccess (Success 200) {String} success The status of the request
-     * @apiSuccess (Success 200) {String} accessToken The accessKey to remember the session
+     * @apiSuccess (200) {String} success The status of the request
+     * @apiSuccess (200) {String} accessToken The accessKey to remember the session
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK
      *      {
@@ -38,10 +38,10 @@ class AuthenticationController extends Controller
      *          "accessToken": "123123drink123123drink"
      *      }
      *
-     * @apiError (Error 404) {String} success Returns 0 success if failed
-     * @apiError (Error 404) {String} error The body of the error message
+     * @apiError (200) {String} success Returns 0 success if failed
+     * @apiError (200) {String} error The body of the error message
      * @apiErrorExample {Json} Error-response:
-     *      HTTP/1.1 404 Not Found
+     *      HTTP/1.1 200
      *      {
      *          "success": 0,
      *          "error": "Please sign up to Featherq"
@@ -64,7 +64,7 @@ class AuthenticationController extends Controller
      * @apiHeader none
      * @apiPermission none
      *
-     * @apiSuccess (Success 200) {String} success The status of the request
+     * @apiSuccess (200) {String} success The status of the request
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK
      *      {
@@ -97,8 +97,8 @@ class AuthenticationController extends Controller
      * @apiParam {String} gender User's gender (provided by the Facebook javascript api)
      * @apiParam {String} click_source the button where the user logged in to featherq
      *
-     * @apiSuccess (Success 200) {String} success The status of the request
-     * @apiSuccess (Success 200) {String} accessToken The accessKey to remember the session
+     * @apiSuccess (200) {String} success The status of the request
+     * @apiSuccess (200) {String} accessToken The accessKey to remember the session
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK
      *      {
@@ -106,10 +106,10 @@ class AuthenticationController extends Controller
      *          "accessToken": "123123drink123123drink"
      *      }
      *
-     * @apiError (Error 404) {String} success Returns 0 success if failed
-     * @apiError (Error 404) {String} error The body of the error message
+     * @apiError (200) {String} success Returns 0 success if failed
+     * @apiError (200) {String} error The body of the error message
      * @apiErrorExample {Json} Error-response:
-     *      HTTP/1.1 404 Not Found
+     *      HTTP/1.1 200
      *      {
      *          "success": 0,
      *          "error": "Please sign up to Featherq"
