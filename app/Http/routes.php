@@ -25,5 +25,5 @@ $app->get('advertisement/{business_id}', 'AdvertisementController@fetchImages');
 $app->post('issuenumber/insert-specific', 'IssueNumberController@postInsertSpecific');
 
 // User Profile API routes
-$app->get('user/{user_id}', 'UserController@fetchProfile');
+$app->get('user/{user_id}', ['uses' => 'UserController@fetchProfile', 'middleware' => 'simple.auth']);
 $app->put('user/update', 'UserController@updateUser');

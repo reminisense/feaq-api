@@ -96,4 +96,11 @@ $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
     require __DIR__.'/../app/Http/routes.php';
 });
 
+$app->middleware([
+    'App\Http\Middleware\SimpleAuthMiddleware'
+]);
+
+$app->bind('App\Http\Middleware\SimpleAuthMiddleware', 'App\Http\Middleware\SimpleAuthMiddleware');
+$app->alias('App\Http\Middleware\SimpleAuthMiddleware', 'simple.auth');
+
 return $app;
