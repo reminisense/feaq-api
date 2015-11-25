@@ -13,7 +13,7 @@ use App\Models\Business;
 class BusinessController extends Controller
 {
     /**
-     * @api {get} /business/search
+     * @api {get} /business/search Search Business
      * @apiName business search
      * @apiGroup Business
      * @apiVersion 1.0.0
@@ -68,7 +68,7 @@ class BusinessController extends Controller
     }
 
     /**
-     * @api {get} /business/search-suggest/{keyword}
+     * @api {get} /business/search-suggest/{keyword} Search Suggestion
      * @apiName business search-suggest
      * @apiGroup Business
      * @apiVersion 1.0.0

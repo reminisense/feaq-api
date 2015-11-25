@@ -15,13 +15,13 @@ class AuthenticationController extends Controller
 {
 
     /**
-     * @api {post} /login
+     * @api {post} /login User Login
      * @apiName login
      * @apiGroup Authentication
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage
      *      http://api.featherq.com/login
-     * @apiDescription Logs in a user into the api and returns an access key
+     * @apiDescription Checks for the user in the database and returns an access key
      *
      * @apiHeader none
      * @apiPermission none
@@ -53,13 +53,13 @@ class AuthenticationController extends Controller
     }
 
     /**
-     * @api {get} /logout
+     * @api {get} /logout User Logout
      * @apiName logout
      * @apiGroup Authentication
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage
      *      http://api.featherq.com/logout
-     * @apiDescription Logs out a user from the api
+     * @apiDescription Forgets the user's session from the app
      *
      * @apiHeader none
      * @apiPermission none
@@ -77,7 +77,7 @@ class AuthenticationController extends Controller
     }
 
     /**
-     * @api {post} /user/register
+     * @api {post} /user/register User Registration
      * @apiName register
      * @apiGroup Authentication
      * @apiVersion 1.0.0

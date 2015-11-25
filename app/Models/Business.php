@@ -36,18 +36,17 @@ class Business extends Model{
 
     public static function getBusinessByNameCountryIndustryTimeopen($name, $country, $industry, $time_open = null, $timezone = null)
     {
+        //parse the time string
         if ($time_open) {
             $time_open_arr = Helper::parseTime($time_open);
-        } else {
-            $time_open_arr['hour'] = '';
-            $time_open_arr['min'] = '';
-            $time_open_arr['ampm'] = '';
         }
 
+        //check for missing idustry values
         if ($industry == 'Industry') {
             $industry = '';
         }
 
+        //check if timezone is numeric
         if(is_numeric($timezone)){
             $timezones = Helper::timezoneOffsetToNameArray($timezone);
         }else{
@@ -55,53 +54,66 @@ class Business extends Model{
         }
 
         //ARA this makes editing queries easier
-        $query = Business::where('name', 'LIKE', '%' . $name . '%')
-            ->where('latitude', '<=', $country['ne_lat'])
-            ->where('latitude', '>=', $country['sw_lat'])
-            ->where('longitude', '<=', $country['ne_lng'])
-            ->where('longitude', '>=', $country['sw_lng'])
-            ->where('industry', 'LIKE', '%' . $industry . '%');
+        //query for business name
+        $query = Business::where('name', 'LIKE', '%' . $name . '%');
 
+        //query for country/location
+        if($country){
+            $query->where('latitude', '<=', $country['ne_lat'])
+                ->where('latitude', '>=', $country['sw_lat'])
+                ->where('longitude', '<=', $country['ne_lng'])
+                ->where('longitude', '>=', $country['sw_lng']);
+        }
+
+        //query for industry
+        if($industry != ''){
+            $query->where('industry', 'LIKE', '%' . $industry . '%');
+        }
+
+        //query timezone if name is not given
         if($name == ''){
             $query->whereIn('timezone', $timezones);
         }
 
-        if ($time_open_arr['ampm'] == 'PM' && $time_open_arr['min'] == '00') {
-            $query->where('open_ampm', '=', 'PM')
-                ->where('open_hour', '>=', $time_open_arr['hour']);
-        } elseif ($time_open_arr['ampm'] == 'PM' && $time_open_arr['min'] == '30') {
-            $query->where('open_ampm', '=', 'PM')
-                ->whereRaw('open_hour > ? OR (open_hour = ? AND open_minute = ?)',
-                    array($time_open_arr['hour'], $time_open_arr['hour'], '30'));
-        } elseif ($time_open_arr['ampm'] == 'AM' && $time_open_arr['min'] == '00') {
-            $query->whereRaw('(open_hour >= ? AND open_ampm = ?) OR (open_hour < ? AND open_ampm = ?)',
-                array($time_open_arr['hour'], 'AM', $time_open_arr['hour'], 'PM'));
-        } elseif ($time_open_arr['ampm'] == 'AM' && $time_open_arr['min'] == '30') {
-            $query->whereRaw('(open_hour > ? AND open_ampm = ?) OR (open_hour < ? AND open_ampm = ?) OR (open_hour = ? AND open_minute = ? AND open_ampm = ?)',
-                array($time_open_arr['hour'], 'AM', $time_open_arr['hour'], 'PM', $time_open_arr['hour'], '30', 'AM'));
+        //query for time open
+        if($time_open){
+            if($time_open_arr['hour'] < 12){
+                $query->where('open_ampm', '=', $time_open_arr['ampm'])
+                    ->where('open_hour', '!=', '12')
+                    ->where('open_hour', '>=', $time_open_arr['hour'])
+                    ->where('open_minute', '>=', $time_open_arr['min']);
+            }elseif($time_open_arr['hour'] == 12){
+                $query->where('open_ampm', '=', $time_open_arr['ampm'])
+                    ->where('open_hour', '<=', '12');
+            }
         }
+
         return $query->get();
     }
 
     public static function searchBusiness($get){
         $values = [
-            'keyword'   => isset($_GET['name']) ? $_GET['name'] : '',
-            'country'   => isset($_GET['country']) ? $_GET['country'] : 'Philippines',
-            'industry'  => isset($_GET['industry']) ? $_GET['industry'] : '',
-            'time_open' => isset($_GET['time_open']) ? $_GET['time_open'] : null,
-            'timezone'  => isset($_GET['user_timezone']) ? $_GET['user_timezone'] : 'Asia/Manila',
-            'limit'     => isset($_GET['limit']) && $_GET['limit'] != '' ? (int) $_GET['limit'] : 8,
-            'offset'    => isset($_GET['offset']) && $_GET['offset'] != '' ? (int) $_GET['offset'] : 0,
+            'keyword'   => isset($get['keyword']) ? $get['keyword'] : '',
+            'industry'  => isset($get['industry']) ? $get['industry'] : '',
+            'country'   => isset($get['country']) && $get['country'] != '' ? $get['country'] : 'Philippines',
+            'time_open' => isset($get['time_open']) && $get['time_open'] != '' ? $get['time_open'] : null,
+            'timezone'  => isset($get['user_timezone']) && $get['timezone'] != '' ? $get['user_timezone'] : 'Asia/Manila',
+            'limit'     => isset($get['limit']) && $get['limit'] != '' ? (int) $get['limit'] : 8,
+            'offset'    => isset($get['offset']) && $get['offset'] != '' ? (int) $get['offset'] : 0,
         ];
 
         $values = json_decode(json_encode($values), FALSE);
-        $geolocation = json_decode(file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.$values->country));
-        $values->location = array(
-            'ne_lat' => $geolocation->results[0]->geometry->bounds->northeast->lat,
-            'ne_lng' => $geolocation->results[0]->geometry->bounds->northeast->lng,
-            'sw_lat' => $geolocation->results[0]->geometry->bounds->southwest->lat,
-            'sw_lng' => $geolocation->results[0]->geometry->bounds->southwest->lng,
-        );
+        if($values->country != ''){
+            $geolocation = json_decode(file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.$values->country));
+            $values->location = array(
+                'ne_lat' => $geolocation->results[0]->geometry->bounds->northeast->lat,
+                'ne_lng' => $geolocation->results[0]->geometry->bounds->northeast->lng,
+                'sw_lat' => $geolocation->results[0]->geometry->bounds->southwest->lat,
+                'sw_lng' => $geolocation->results[0]->geometry->bounds->southwest->lng,
+            );
+        }else{
+            $values->location = [];
+        }
         $res = Business::getBusinessByNameCountryIndustryTimeopen($values->keyword, $values->location, $values->industry, $values->time_open, $values->timezone);
 
         $arr = array();
