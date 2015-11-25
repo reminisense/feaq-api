@@ -73,64 +73,65 @@ class UserController extends Controller
     }
 
     /**
-     * @api {get} user/update Update user information
+     * @api {put} user/update Update user information
      * @apiName UpdateUserInfo
      * @apiGroup User
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
      *     https://api.featherq.com/user/update
-     * @apiDescription Update user information.
+     * @apiDescription Update user information using the information given from JSON.
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Current User & Admin
      *
      * @apiParam {Number} user_id The id of the user.
-     * @apiParam {Number} modified first name of user.
-     * @apiParam {Number} modified last name of user.
-     * @apiParam {Number} modified contact number of user.
-     * @apiParam {Number} modified address of user.
+     * @apiParam {String} first_name The modified first name of user.
+     * @apiParam {String} last_name The modified last name of user.
+     * @apiParam {String} phone The modified contact number of user.
+     * @apiParam {String} local_address The modified address of user.
      *
-     * @apiSuccess (200) {String} result.
+     * @apiSuccess (200) {String} success The flag indicating the success/failure of update process. Returns 1 if process was successful, 0 otherwise.
      * @apiSuccessExample {Json} Success-Response:
      *     HTTP/1.1 200 OK
      *     {
-     *          "result" : 1
+     *          "success" : 1
      *      }
      *
-     * @apiError (200) {Object} result 0
-     * @apiError (200) {Object} error message
+     * @apiError (200) {Object} success The flag indicating the success/failure of update process. Returns 1 if process was successful, 0 otherwise.
+     * @apiError (200) {Object} err_message The description of the error.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
-     *          "result": "0",
-     *          "error": "User not found!"
+     *          "success": "0",
+     *          "err_message": "User not found!"
      *     }
      */
     public function updateUser()
     {
         $userData = Input::all();
-        $user = User::find($userData['user_id']);
+        $user = User::find(isset($userData['user_id']) ? $userData['user_id'] : '');
         if (is_null($user)) {
-            return json_encode([
-                'result' => 0,
-                'error' => 'User not found!'
+            return response()->json([
+                'success' => 0,
+                'err_message' => 'User not found.'
             ]);
         }
 
-        $user->first_name = $userData['edit_first_name'];
-        $user->last_name = $userData['edit_last_name'];
-        $user->phone = $userData['edit_mobile'];
-        $user->local_address = $userData['edit_user_location'];
+        // cleaning up data.. if not set,
+        $user->first_name = isset($userData['first_name']) ? $userData['first_name'] : $user->first_name;
+        $user->last_name = isset($userData['last_name']) ? $userData['last_name'] : $user->last_name;
+        $user->phone = isset($userData['phone']) ? $userData['phone'] : $user->phone;
+        $user->local_address = isset($userData['local_address']) ? $userData['local_address'] : $user->local_address;
 
-
+        // save that shit!
         if ($user->save()) {
-            return json_encode([
-                'result' => 1
+            return response()->json([
+                'success' => 1
             ]);
         } else {
-            return json_encode([
-                'result' => 0,
-                'error' => 'Something went wrong while trying to save your profile.'
+            return response()->json([
+                'success' => 0,
+                'err_message' => 'Something went wrong while trying to save your profile.'
             ]);
         }
     }

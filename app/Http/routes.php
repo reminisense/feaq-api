@@ -26,4 +26,4 @@ $app->post('issuenumber/insert-specific', 'IssueNumberController@postInsertSpeci
 
 // User Profile API routes
 $app->get('user/{user_id}', 'UserController@fetchProfile');
-$app->post('user/update', 'UserController@updateUser');
+$app->put('user/update', 'UserController@updateUser');
