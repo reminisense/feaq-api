@@ -39,12 +39,12 @@ class AuthenticationController extends Controller
      *      }
      *
      * @apiError (200) {String} success Returns <code>0</code> if the login fails.
-     * @apiError (200) {String} err_message The body of the error message.
+     * @apiError (200) {String} SignUpRequired User has not registered to Featherq.
      * @apiErrorExample {Json} Error-response:
      *      HTTP/1.1 200
      *      {
      *          "success": 0,
-     *          "err_message": "Please sign up to Featherq"
+     *          "err_message": "SignUpRequired"
      *      }
      *
      */
