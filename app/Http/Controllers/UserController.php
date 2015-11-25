@@ -27,12 +27,12 @@ class UserController extends Controller
    *
    * @apiParam {Number} user_id The id of the user.
    *
-   * @apiSuccess (Success 200) {Number} user_id The id of the user.
-   * @apiSuccess (Success 200) {String} email The email address of the user.
-   * @apiSuccess (Success 200) {String} first_name The first name of the user.
-   * @apiSuccess (Success 200) {String} last_name The last name of the user.
-   * @apiSuccess (Success 200) {String} phone The phone number of the user.
-   * @apiSuccess (Success 200) {String} local_address The address of the user.
+   * @apiSuccess (200) {Number} user_id The id of the user.
+   * @apiSuccess (200) {String} email The email address of the user.
+   * @apiSuccess (200) {String} first_name The first name of the user.
+   * @apiSuccess (200) {String} last_name The last name of the user.
+   * @apiSuccess (200) {String} phone The phone number of the user.
+   * @apiSuccess (200) {String} local_address The address of the user.
    *
    * @apiSuccessExample {Json} Success-Response:
    *     HTTP/1.1 200 OK
@@ -45,11 +45,11 @@ class UserController extends Controller
    *       "local_address": "Disneyland, Hongkong"
    *     }
    *
-   * @apiError (Error 404) {String} NoUserFound There were no users found with the given <code>user_id</code>.
+   * @apiError (200) {String} UserNotFound There were no users found with the given <code>user_id</code>.
    * @apiErrorExample {Json} Error-Response:
-   *     HTTP/1.1 404 Not Found
+   *     HTTP/1.1 200 OK
    *     {
-   *       "err_message": "NoUserFound"
+   *       "err_message": "UserNotFound"
    *     }
    */
   public function fetchProfile($user_id) {
