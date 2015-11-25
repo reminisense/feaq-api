@@ -74,12 +74,12 @@ class BusinessController extends Controller
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage
      *      http://api.featherq.com/business/search-suggest/keyword
-     * @apiDescription Suggests search items for businesses based on the given keyword
+     * @apiDescription Suggests search items for businesses based on the given keyword.
      *
      * @apiHeader none
      * @apiPermission none
      *
-     * @apiParam {String} keyword The keyword used to search for the business
+     * @apiParam {String} keyword The keyword used to search for the business.
      *
      * @apiSuccess (200) {Object[]} business Array of objects with business details
      * @apiSuccess (200) {String} business.business_name The name of the business
