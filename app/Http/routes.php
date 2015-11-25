@@ -21,7 +21,7 @@ $app->post('login', 'AuthenticationController@login');
 $app->get('logout', 'AuthenticationController@logout');
 
 //Dashboard routes
-$app->get('business/search-suggestions/{keyword}', 'BusinessController@searchSuggest');
+$app->get('business/search-suggest/{keyword}', 'BusinessController@searchSuggest');
 
 $app->get('business/search', 'BusinessController@search');
 
