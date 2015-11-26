@@ -261,8 +261,8 @@ class QueueController extends Controller {
         }
       }
 
-      usort($processed_numbers, array('ProcessQueue', 'sortProcessedNumbers'));
-      usort($called_numbers, array('ProcessQueue', 'sortCalledNumbers'));
+      usort($processed_numbers, $this->sortProcessedNumbers());
+      usort($called_numbers, $this->sortCalledNumbers());
 
       $priority_numbers->last_number_given = $last_number_given;
       $priority_numbers->next_number = $this->nextNumber($priority_numbers->last_number_given, QueueSettings::numberStart($service_id), QueueSettings::numberLimit($service_id));
@@ -284,6 +284,16 @@ class QueueController extends Controller {
     }
 
     return $priority_numbers;
+  }
+
+  private function sortProcessedNumbers($var1, $var2)
+  {
+    return $var1['time_processed'] - $var2['time_processed'];
+  }
+
+  private function sortCalledNumbers($var1, $var2)
+  {
+    return $var2['time_called'] - $var1['time_called'];
   }
 
 }
