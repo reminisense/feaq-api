@@ -17,7 +17,16 @@ class Authentication extends Model{
     public static function register($data){
         $post = json_decode(json_encode($data));
         $response = FB::VerifyFB($post->accessToken);
-        if ($response->getGraphUser()) {
+        $success = false;
+        try{
+            if ($response->getGraphUser()) {
+                $success = true;
+            }
+        }catch(\Exception $e){
+            return json_encode(['success' => 0, 'error' => 'Facebook authentication failed']);
+        }
+
+        if($success){
             $values = array(
                 'fb_id' => $post->fb_id,
                 'fb_url' => $post->fb_url,
@@ -34,6 +43,8 @@ class Authentication extends Model{
             }
 
             return Authentication::login($values['fb_id'], $values['click_source']);
+        }else{
+            return json_encode(['success' => 0, 'error' => 'Facebook authentication failed']);
         }
     }
 

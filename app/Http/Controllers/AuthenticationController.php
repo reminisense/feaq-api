@@ -71,6 +71,16 @@ class AuthenticationController extends Controller
      *          "success": 1
      *      }
      *
+     * @apiError (200) {String} success Returns 0 success if failed
+     * @apiError (200) {String} error The body of the error message
+     * @apiErrorExample {Json} Error-response:
+     *      HTTP/1.1 200
+     *      {
+     *          "success": 0,
+     *          "error": "Facebook authentication failed"
+     *      }
+     *
+     *
      */
     public function logout(){
         return Authentication::logout();
