@@ -19,10 +19,10 @@ class AdvertisementController extends Controller {
    *
    * @apiParam {Number} business_id The id of the business.
    *
-   * @apiSuccess (Success 200) {String} img_id The id of the image.
-   * @apiSuccess (Success 200) {String} path The filesystem path of the image.
-   * @apiSuccess (Success 200) {String} weight The weight/place of the image.
-   * @apiSuccess (Success 200) {String} business_id The id of the business to which the image belongs.
+   * @apiSuccess (200) {String} img_id The id of the image.
+   * @apiSuccess (200) {String} path The filesystem path of the image.
+   * @apiSuccess (200) {String} weight The weight/place of the image.
+   * @apiSuccess (200) {String} business_id The id of the business to which the image belongs.
    * @apiSuccessExample {Json} Success-Response:
    *     HTTP/1.1 200 OK
    *     [
@@ -40,9 +40,9 @@ class AdvertisementController extends Controller {
    *       }
    *     ]
    *
-   * @apiError (Error 404) {String} NoImagesFound No Images were found using the <code>business_id</code>.
+   * @apiError (200) {String} NoImagesFound No Images were found using the <code>business_id</code>.
    * @apiErrorExample {Json} Error-Response:
-   *     HTTP/1.1 404 Not Found
+   *     HTTP/1.1 200 OK
    *     {
    *       "err_message": "NoImagesFound"
    *     }

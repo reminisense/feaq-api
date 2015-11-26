@@ -118,7 +118,7 @@ class BroadcastController extends Controller
    *
    * @apiError (200) {String} NoBusinessFound No Businesses were found using the <code>raw_code</code>.
    * @apiErrorExample {Json} Error-Response:
-   *     HTTP/1.1 404 Not Found
+   *     HTTP/1.1 200 OK
    *     {
    *       "err_message": "NoBusinessFound"
    *     }
