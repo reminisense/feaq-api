@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Input;
 
 class UserController extends Controller
 {
@@ -71,4 +72,66 @@ class UserController extends Controller
     }
   }
 
+    /**
+     * @api {put} user/update Update User Information
+     * @apiName UpdateUserInfo
+     * @apiGroup User
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/user/update
+     * @apiDescription Update user information using the information given from JSON.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Current User & Admin
+     *
+     * @apiParam {Number} user_id The id of the user.
+     * @apiParam {String} first_name The modified first name of user.
+     * @apiParam {String} last_name The modified last name of user.
+     * @apiParam {String} phone The modified contact number of user.
+     * @apiParam {String} local_address The modified address of user.
+     *
+     * @apiSuccess (200) {String} success The flag indicating the success/failure of update process. Returns 1 if process was successful, 0 otherwise.
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *          "success" : 1
+     *      }
+     *
+     * @apiError (200) {Object} success The flag indicating the success/failure of update process. Returns 1 if process was successful, 0 otherwise.
+     * @apiError (200) {Object} NoUserFound There are no users with the given user_id.
+     * @apiError (200) {Object) SomethingWentWrong Something went wrong while saving your data.
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *          "success": "0",
+     *          "err_message": "NoUserFound"
+     *     }
+     */
+    public function updateUser()
+    {
+        $userData = Input::all();
+        $user = User::find(isset($userData['user_id']) ? $userData['user_id'] : '');
+        if (is_null($user)) {
+            return response()->json([
+                'success' => 0,
+                'err_message' => 'NoUserFound'
+            ]);
+        }
+
+        $user->first_name = isset($userData['first_name']) ? $userData['first_name'] : $user->first_name;
+        $user->last_name = isset($userData['last_name']) ? $userData['last_name'] : $user->last_name;
+        $user->phone = isset($userData['phone']) ? $userData['phone'] : $user->phone;
+        $user->local_address = isset($userData['local_address']) ? $userData['local_address'] : $user->local_address;
+
+        if ($user->save()) {
+            return response()->json([
+                'success' => 1
+            ]);
+        } else {
+            return response()->json([
+                'success' => 0,
+                'err_message' => 'SomethingWentWrong'
+            ]);
+        }
+    }
 }

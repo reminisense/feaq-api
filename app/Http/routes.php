@@ -50,3 +50,5 @@ $app->post('queue/insert-number', 'QueueController@insertSpecific');
 
 // Landing Page API
 $app->post('business/search', 'LandingPageController@search');
+
+$app->put('user/update', 'UserController@updateUser');
