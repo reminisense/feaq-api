@@ -25,7 +25,6 @@ class Authentication extends Model{
                 'last_name' => $post->last_name,
                 'email' => $post->email,
                 'gender' => $post->gender,
-                'click_source' => $post->click_source
             );
 
             if(!User::checkFBUser($post->fb_id)){
@@ -33,7 +32,7 @@ class Authentication extends Model{
                 Watchdog::createRecord(['action_type' => 'authentication', 'value' => serialize(['action'=> 'signup', 'success' => true,'click_source' => $post->click_source])]); //save to watchdog the source of login
             }
 
-            return Authentication::login($values['fb_id'], $values['click_source']);
+            return Authentication::login($values['fb_id'], $post->click_source);
         }else{
             return json_encode(['success' => 0, 'error' => 'Facebook authentication failed']);
         }
