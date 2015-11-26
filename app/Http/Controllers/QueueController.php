@@ -18,12 +18,12 @@ use Illuminate\Support\Facades\Input;
 class QueueController extends Controller {
 
   /**
-   * @api {post} issuenumber/insert-specific Inserts Specific Number
+   * @api {post} queue/insert-specific Inserts Specific Number
    * @apiName PostInsertSpecific
    * @apiGroup Queue
    * @apiVersion 1.0.0
    * @apiExample {js} Example Usage:
-   *     https://api.featherq.com/issuenumber/insert-specific
+   *     https://api.featherq.com/queue/insert-specific
    * @apiDescription This function enables the authorized user to queue by inserting the validated number to the database.
    *
    * @apiHeader {String} access-key The unique access key sent by the client.
@@ -40,11 +40,11 @@ class QueueController extends Controller {
    * @apiParam {String} user_id The id of the user requesting the queue.
    * @apiParam {String} time_assigned The time on which the queue was inserted to the database.
    *
-   * @apiSuccess (Success 200) {String} success The boolean flag of the successful process.
-   * @apiSuccess (Success 200) {String[]} number An array containing the information about the current transaction.
-   * @apiSuccess (Success 200) {String} transaction_number The id of the current transaction.
-   * @apiSuccess (Success 200) {String} priority_number The number given to the user.
-   * @apiSuccess (Success 200) {String} confirmation_code The code given to the user along with the priority number for validation.
+   * @apiSuccess (200) {String} success The boolean flag of the successful process.
+   * @apiSuccess (200) {String[]} number An array containing the information about the current transaction.
+   * @apiSuccess (200) {String} transaction_number The id of the current transaction.
+   * @apiSuccess (200) {String} priority_number The number given to the user.
+   * @apiSuccess (200) {String} confirmation_code The code given to the user along with the priority number for validation.
    * @apiSuccessExample {Json} Success-Response:
    *     HTTP/1.1 200 OK
    *     [
@@ -58,9 +58,9 @@ class QueueController extends Controller {
    *       },
    *     ]
    *
-   * @apiError (Error 404) {String} TransactionInvalid The transaction is invalid.
+   * @apiError (200) {String} TransactionInvalid The transaction is invalid.
    * @apiErrorExample {Json} Error-Response:
-   *     HTTP/1.1 404 Not Found
+   *     HTTP/1.1 200 OK
    *     [
    *       {
    *          "success": 0
@@ -159,7 +159,7 @@ class QueueController extends Controller {
     $uncalled_numbers = array();
     $processed_numbers = array();
     $timebound_numbers = array(); //ARA Timebound assignment
-    $priority_numbers = new stdClass();
+    $priority_numbers = new \stdClass();
 
     if($numbers){
       foreach($numbers as $number){

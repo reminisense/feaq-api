@@ -71,7 +71,7 @@ class PriorityQueue extends Model
     }
 
     public static function queuedNumbers($service_id, $date, $start = 0, $take = 2147483648){
-        $query = DB::select('
+        $query = \DB::select('
 			SELECT
 				n.*,
 				q.priority_number,
