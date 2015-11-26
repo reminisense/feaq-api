@@ -42,7 +42,7 @@ class Analytics extends Model{
     }
 
     public static function getServiceRemainingCount($service_id){
-        $all_numbers = ProcessQueue::allNumbers($service_id);
+        $all_numbers = Queue::allNumbers($service_id);
         return isset($all_numbers->uncalled_numbers) ? count($all_numbers->uncalled_numbers) : 0;
     }
 
@@ -86,16 +86,6 @@ class Analytics extends Model{
 
     public static function insertAnalyticsQueueNumberRemoved($transaction_number, $service_id, $date, $time, $terminal_id, $queue_platform){
         Analytics::insertAnalyticsQueueNumber(3, $transaction_number, $service_id, $date, $time, $terminal_id, $queue_platform);
-    }
-
-    /**
-     * requires an array of arrays
-     * ex. 'field' => array('conditional_operator', 'value')
-     * @param $conditions
-     * @return mixed
-     */
-    public static function getQueueAnalyticsRows($conditions){
-        return Helper::getMultipleQueries('queue_analytics', $conditions);
     }
 
     public static function getBusinessAnalytics($business_id, $startdate = null, $enddate = null){
@@ -160,11 +150,6 @@ class Analytics extends Model{
         }else{
             return Analytics::getAverageTimeValueFromActionByBusinessId(1, 2, $business_id, $startdate, $enddate);
         }
-    }
-
-    //gets the string representation of the average time
-    public static function getAverageTimeFromActionByBusinessId($action1, $action2, $business_id, $startdate, $enddate){
-        return Helper::millisecondsToHMSFormat(Analytics::getAverageTimeValueFromActionByBusinessId($action1, $action2, $business_id, $startdate, $enddate));
     }
 
     //gets the numeric representation of the average time
