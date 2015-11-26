@@ -14,10 +14,9 @@ use Illuminate\Support\Facades\Input;
 class LandingPageController extends Controller
 {
 
-
     /**
-     * @api {post} business/search Fetch businesses.
-     * @apiName Business Search
+     * @api {post} business/search Search Businesses.
+     * @apiName Search
      * @apiGroup Business
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
@@ -25,16 +24,27 @@ class LandingPageController extends Controller
      * @apiDescription Fetch businesses according to given search parameters.
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
-     * @apiPermission Business Owner
+     * @apiPermission none
      *
-     * @apiParam {String} country The country where business operates.
-     * @apiParam {String} industry The industry where the business belongs to.
-     * @apiParam {String} keyword The keyword to search.
-     * @apiParam {Number} latitude Geolocation latitude.
-     * @apiParam {Number} longitude Geolocation longitude.
-     * @apiParam {Number} time_open The id of the business.
-     * @apiParam {Number} time_open The id of the business.
+     * @apiParam {String} [keyword] The keyword used to search for the business.
+     * @apiParam {String} [country] The country of the business.
+     * @apiParam {String} [industry] The industry of the business.
+     * @apiParam {String} [time_open] The time the business opens.
+     * @apiParam {String} [timezone] The timezone of the business.
+     * @apiParam {Number} [limit] The maximum number of entries to be retrieved.
+     * @apiParam {Number} [offset] The number where the entries retrieved will start.
      *
+     * @apiSuccess (200) {Object[]} business Array of objects with business details.
+     * @apiSuccess (200) {Number} business.business_id The business id of the retrieved business from the database.
+     * @apiSuccess (200) {String} business.business_name The name of the business.
+     * @apiSuccess (200) {String} business.local_address The address of the business.
+     * @apiSuccess (200) {String} business.time_open The time that the business opens.
+     * @apiSuccess (200) {String} business.time_close The time that the business closes.
+     * @apiSuccess (200) {String} business.waiting_time Indicates how heavy the queue is based on time it takes for the last number in the queue to be called.
+     * @apiSuccess (200) {Number} business.last_number_called The last number called by the business.
+     * @apiSuccess (200) {Number} business.next_available_number The next number that can be placed to the queue.
+     * @apiSuccess (200) {Number} business.last_active The number of days when the business last processed the queue.
+     * @apiSuccess (200) {Boolean} business.card_bool Indicates if the business is active or not.
      *
      * @apiSuccess (200) {Array} list of businesses matching search parameters.
      * @apiSuccessExample {Json} Success-Response:
@@ -65,8 +75,7 @@ class LandingPageController extends Controller
      *
      */
     public function search() {
-        // TODO need to optimize this!! very very slow. :(
-        $search_param = Input::all();
-        return Business::searchBusiness($search_param);
+        $keywords = Input::all();
+        return Business::searchBusiness($keywords);
     }
 }
