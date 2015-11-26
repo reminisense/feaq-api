@@ -73,7 +73,7 @@ class UserController extends Controller
     }
 
     /**
-     * @api {put} user/update Update user information
+     * @api {put} user/update Update User Information
      * @apiName UpdateUserInfo
      * @apiGroup User
      * @apiVersion 1.0.0
@@ -98,12 +98,13 @@ class UserController extends Controller
      *      }
      *
      * @apiError (200) {Object} success The flag indicating the success/failure of update process. Returns 1 if process was successful, 0 otherwise.
-     * @apiError (200) {Object} err_message The description of the error.
+     * @apiError (200) {Object} NoUserFound There are no users with the given user_id.
+     * @apiError (200) {Object) SomethingWentWrong Something went wrong while saving your data.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
      *          "success": "0",
-     *          "err_message": "User not found!"
+     *          "err_message": "NoUserFound"
      *     }
      */
     public function updateUser()
@@ -113,17 +114,15 @@ class UserController extends Controller
         if (is_null($user)) {
             return response()->json([
                 'success' => 0,
-                'err_message' => 'User not found.'
+                'err_message' => 'NoUserFound'
             ]);
         }
 
-        // cleaning up data.. if not set,
         $user->first_name = isset($userData['first_name']) ? $userData['first_name'] : $user->first_name;
         $user->last_name = isset($userData['last_name']) ? $userData['last_name'] : $user->last_name;
         $user->phone = isset($userData['phone']) ? $userData['phone'] : $user->phone;
         $user->local_address = isset($userData['local_address']) ? $userData['local_address'] : $user->local_address;
 
-        // save that shit!
         if ($user->save()) {
             return response()->json([
                 'success' => 1
@@ -131,7 +130,7 @@ class UserController extends Controller
         } else {
             return response()->json([
                 'success' => 0,
-                'err_message' => 'Something went wrong while trying to save your profile.'
+                'err_message' => 'SomethingWentWrong'
             ]);
         }
     }
