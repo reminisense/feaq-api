@@ -2,21 +2,20 @@
 /**
  * Created by PhpStorm.
  * User: USER
- * Date: 1/22/15
- * Time: 5:20 PM
+ * Date: 11/17/2015
+ * Time: 11:12 AM
  */
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Business extends Model
-{
+class Business extends Model{
 
     protected $table = 'business';
     protected $primaryKey = 'business_id';
     public $timestamps = false;
-
+    
     public static function name($business_id)
     {
         return Business::where('business_id', '=', $business_id)->select(array('name'))->first()->name;
@@ -86,7 +85,7 @@ class Business extends Model
     {
         return Business::name(Branch::businessId($branch_id));
     }
-
+    
     public static function getBusinessIdByTerminalId($terminal_id)
     {
         return Business::getBusinessIdByServiceId(Terminal::serviceId($terminal_id));
@@ -97,6 +96,14 @@ class Business extends Model
         return Branch::businessId(Service::branchId($service_id));
     }
 
+    public static function searchSuggest($keyword){
+        return Business::where('name', 'LIKE', '%' . $keyword . '%')
+            ->orWhere('local_address', 'LIKE', '%' . $keyword . '%')
+            ->select(array('name', 'local_address'))
+            ->get()
+            ->toArray();
+    }
+    
     public static function getBusinessDetails($business_id)
     {
         $business = Business::where('business_id', '=', $business_id)->get()->first();
@@ -207,22 +214,28 @@ class Business extends Model
         $business->terminals = $terminals;
 
         return $business;
+
+    public static function searchSuggest($keyword){
+        return Business::where('name', 'LIKE', '%' . $keyword . '%')
+            ->orWhere('local_address', 'LIKE', '%' . $keyword . '%')
+            ->select(array('name', 'local_address'))
+            ->get()
+            ->toArray();
     }
 
     public static function getBusinessByNameCountryIndustryTimeopen($name, $country, $industry, $time_open = null, $timezone = null)
     {
+        //parse the time string
         if ($time_open) {
             $time_open_arr = Helper::parseTime($time_open);
-        } else {
-            $time_open_arr['hour'] = '';
-            $time_open_arr['min'] = '';
-            $time_open_arr['ampm'] = '';
         }
 
+        //check for missing idustry values
         if ($industry == 'Industry') {
             $industry = '';
         }
 
+        //check if timezone is numeric
         if(is_numeric($timezone)){
             $timezones = Helper::timezoneOffsetToNameArray($timezone);
         }else{
@@ -230,36 +243,93 @@ class Business extends Model
         }
 
         //ARA this makes editing queries easier
-        $query = Business::where('name', 'LIKE', '%' . $name . '%')
-            //->where('local_address', 'LIKE', '%' . $country . '%')
-            ->where('latitude', '<=', $country['ne_lat'])
-            ->where('latitude', '>=', $country['sw_lat'])
-            ->where('longitude', '<=', $country['ne_lng'])
-            ->where('longitude', '>=', $country['sw_lng'])
-            ->where('industry', 'LIKE', '%' . $industry . '%');
+        //query for business name
+        $query = Business::where('name', 'LIKE', '%' . $name . '%');
 
+        //query for country/location
+        if($country){
+            $query->where('latitude', '<=', $country['ne_lat'])
+                ->where('latitude', '>=', $country['sw_lat'])
+                ->where('longitude', '<=', $country['ne_lng'])
+                ->where('longitude', '>=', $country['sw_lng']);
+        }
+
+        //query for industry
+        if($industry != ''){
+            $query->where('industry', 'LIKE', '%' . $industry . '%');
+        }
+
+        //query timezone if name is not given
         if($name == ''){
             $query->whereIn('timezone', $timezones);
         }
 
-        if ($time_open_arr['ampm'] == 'PM' && $time_open_arr['min'] == '00') {
-            $query->where('open_ampm', '=', 'PM')
-                ->where('open_hour', '>=', $time_open_arr['hour']);
-        } elseif ($time_open_arr['ampm'] == 'PM' && $time_open_arr['min'] == '30') {
-            $query->where('open_ampm', '=', 'PM')
-                ->whereRaw('open_hour > ? OR (open_hour = ? AND open_minute = ?)',
-                    array($time_open_arr['hour'], $time_open_arr['hour'], '30'));
-        } elseif ($time_open_arr['ampm'] == 'AM' && $time_open_arr['min'] == '00') {
-            $query->whereRaw('(open_hour >= ? AND open_ampm = ?) OR (open_hour < ? AND open_ampm = ?)',
-                array($time_open_arr['hour'], 'AM', $time_open_arr['hour'], 'PM'));
-        } elseif ($time_open_arr['ampm'] == 'AM' && $time_open_arr['min'] == '30') {
-            $query->whereRaw('(open_hour > ? AND open_ampm = ?) OR (open_hour < ? AND open_ampm = ?) OR (open_hour = ? AND open_minute = ? AND open_ampm = ?)',
-                array($time_open_arr['hour'], 'AM', $time_open_arr['hour'], 'PM', $time_open_arr['hour'], '30', 'AM'));
+        //query for time open
+        if($time_open){
+            if($time_open_arr['hour'] < 12){
+                $query->where('open_ampm', '=', $time_open_arr['ampm'])
+                    ->where('open_hour', '!=', '12')
+                    ->where('open_hour', '>=', $time_open_arr['hour'])
+                    ->where('open_minute', '>=', $time_open_arr['min']);
+            }elseif($time_open_arr['hour'] == 12){
+                $query->where('open_ampm', '=', $time_open_arr['ampm'])
+                    ->where('open_hour', '<=', '12');
+            }
         }
+
         return $query->get();
     }
 
-    public static function businessExistsByNameByAddress($business_name, $business_address)
+    public static function searchBusiness($get){
+        $values = [
+            'keyword'   => isset($get['keyword']) ? $get['keyword'] : '',
+            'industry'  => isset($get['industry']) ? $get['industry'] : '',
+            'country'   => isset($get['country']) && $get['country'] != '' ? $get['country'] : 'Philippines',
+            'time_open' => isset($get['time_open']) && $get['time_open'] != '' ? $get['time_open'] : null,
+            'timezone'  => isset($get['user_timezone']) && $get['timezone'] != '' ? $get['user_timezone'] : 'Asia/Manila',
+            'limit'     => isset($get['limit']) && $get['limit'] != '' ? (int) $get['limit'] : 8,
+            'offset'    => isset($get['offset']) && $get['offset'] != '' ? (int) $get['offset'] : 0,
+        ];
+
+        $values = json_decode(json_encode($values), FALSE);
+        if($values->country != ''){
+            $geolocation = json_decode(file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.$values->country));
+            $values->location = array(
+                'ne_lat' => $geolocation->results[0]->geometry->bounds->northeast->lat,
+                'ne_lng' => $geolocation->results[0]->geometry->bounds->northeast->lng,
+                'sw_lat' => $geolocation->results[0]->geometry->bounds->southwest->lat,
+                'sw_lng' => $geolocation->results[0]->geometry->bounds->southwest->lng,
+            );
+        }else{
+            $values->location = [];
+        }
+        $res = Business::getBusinessByNameCountryIndustryTimeopen($values->keyword, $values->location, $values->industry, $values->time_open, $values->timezone);
+
+        $arr = array();
+        foreach ($res as $count => $data) {
+            $first_service = Service::getFirstServiceOfBusiness($data->business_id);
+            $all_numbers = Queue::allNumbers($first_service->service_id);
+            $time_open = $data->open_hour . ':' . Helper::doubleZero($data->open_minute) . ' ' . strtoupper($data->open_ampm);
+            $time_close = $data->close_hour . ':' . Helper::doubleZero($data->close_minute) . ' ' . strtoupper($data->close_ampm);
+            $arr[] = array(
+                'business_id' => $data->business_id,
+                'business_name' => $data->name,
+                'local_address' => $data->local_address,
+                'time_open' => Helper::changeBusinessTimeTimezone($time_open, $data->timezone, $values->timezone),
+                'time_close' => Helper::changeBusinessTimeTimezone($time_close, $data->timezone, $values->timezone),
+                'waiting_time' => Analytics::getWaitingTimeString($data->business_id),
+
+                //ARA more info for business cards
+                'last_number_called' => count($all_numbers->called_numbers) > 0 ? $all_numbers->called_numbers[0]['priority_number'] : 'none', //ok
+                'next_available_number' => $all_numbers->next_number, //ok
+                'last_active' => Analytics::getLastActive($data->business_id),
+                'card_bool' => count($all_numbers->called_numbers) > 0 || count($all_numbers->uncalled_numbers) + count($all_numbers->timebound_numbers) > 0,
+            );
+        }
+
+        return array_slice($arr, $values->offset, $values->limit);
+    }
+public static function businessExistsByNameByAddress($business_name, $business_address)
     {
         return Business::where('name', '=', $business_name)
             ->where('local_address', '=', $business_address)
@@ -519,43 +589,43 @@ class Business extends Model
 
     public static function processingBusinessBool($business_id)
     {
-      /*
-        $filepath = public_path() . '/json/' . $business_id . '.json';
-        $data = json_decode(file_get_contents($filepath));
-        if ($data->box1->number != '') {
-            return TRUE;
-        } elseif (isset($data->box2)) {
-            if ($data->box2->number != '') {
-                return TRUE;
-            }
-        } elseif (isset($data->box3)) {
-            if ($data->box3->number != '') {
-                return TRUE;
-            }
-        } elseif (isset($data->box4)) {
-            if ($data->box4->number != '') {
-                return TRUE;
-            }
-        } elseif (isset($data->box5)) {
-            if ($data->box5->number != '') {
-                return TRUE;
-            }
-        } elseif (isset($data->box6)) {
-            if ($data->box6->number != '') {
-                return TRUE;
-            }
-        } elseif ($data->get_num != '') {
-            return TRUE;
-        }
-        return FALSE;
-      */
+        /*
+          $filepath = public_path() . '/json/' . $business_id . '.json';
+          $data = json_decode(file_get_contents($filepath));
+          if ($data->box1->number != '') {
+              return TRUE;
+          } elseif (isset($data->box2)) {
+              if ($data->box2->number != '') {
+                  return TRUE;
+              }
+          } elseif (isset($data->box3)) {
+              if ($data->box3->number != '') {
+                  return TRUE;
+              }
+          } elseif (isset($data->box4)) {
+              if ($data->box4->number != '') {
+                  return TRUE;
+              }
+          } elseif (isset($data->box5)) {
+              if ($data->box5->number != '') {
+                  return TRUE;
+              }
+          } elseif (isset($data->box6)) {
+              if ($data->box6->number != '') {
+                  return TRUE;
+              }
+          } elseif ($data->get_num != '') {
+              return TRUE;
+          }
+          return FALSE;
+        */
 
-      // will be using Aunne's data from process queue to determine if the business is active or inactive
-      $first_service = Service::getFirstServiceOfBusiness($business_id);
-      $all_numbers = ProcessQueue::allNumbers($first_service->service_id);
-      $is_calling = count($all_numbers->called_numbers) > 0 ? true : false;
-      $is_issuing = count($all_numbers->uncalled_numbers) + count($all_numbers->timebound_numbers) > 0 ? true : false;
-      return $is_calling || $is_issuing;
+        // will be using Aunne's data from process queue to determine if the business is active or inactive
+        $first_service = Service::getFirstServiceOfBusiness($business_id);
+        $all_numbers = ProcessQueue::allNumbers($first_service->service_id);
+        $is_calling = count($all_numbers->called_numbers) > 0 ? true : false;
+        $is_issuing = count($all_numbers->uncalled_numbers) + count($all_numbers->timebound_numbers) > 0 ? true : false;
+        return $is_calling || $is_issuing;
     }
 
     public static function getBusinessIdByName($business_name){

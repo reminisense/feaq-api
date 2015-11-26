@@ -2,13 +2,26 @@
 /**
  * Created by PhpStorm.
  * User: USER
- * Date: 2/10/15
- * Time: 4:51 PM
+ * Date: 11/19/2015
+ * Time: 11:01 AM
  */
 
-class Analytics extends Eloquent{
+namespace App\Models;
+use Illuminate\Database\Eloquent\Model;
+
+class Analytics extends Model{
     protected $table = 'queue_analytics';
     public $timestamps = false;
+
+    /**
+     * requires an array of arrays
+     * ex. 'field' => array('conditional_operator', 'value')
+     * @param $conditions
+     * @return mixed
+     */
+    public static function getQueueAnalyticsRows($conditions){
+        return Helper::getMultipleQueries('queue_analytics', $conditions);
+    }
 
     public static function getBusinessRemainingCount($business_id){
         $uncalled_numbers = 0;
@@ -127,6 +140,10 @@ class Analytics extends Eloquent{
 
     public static function getTotalNumbersProcessedByBusinessId($business_id, $startdate, $enddate){
         return count(Analytics::getQueueAnalyticsRows(['action' => ['>', 1], 'business_id' => ['=', $business_id ], 'date' => ['>=', $startdate], 'date.' => ['<=', $enddate]]));
+    }
+
+    public static function getAverageTimeFromActionByBusinessId($action1, $action2, $business_id, $startdate, $enddate){
+        return Helper::millisecondsToHMSFormat(Analytics::getAverageTimeValueFromActionByBusinessId($action1, $action2, $business_id, $startdate, $enddate));
     }
 
     public static function getAverageTimeCalledByBusinessId($business_id, $format = 'string', $startdate, $enddate){
