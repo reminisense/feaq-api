@@ -17,16 +17,7 @@ class Authentication extends Model{
     public static function register($data){
         $post = json_decode(json_encode($data));
         $response = FB::VerifyFB($post->accessToken);
-        $success = false;
-        try{
-            if ($response->getGraphUser()) {
-                $success = true;
-            }
-        }catch(\Exception $e){
-            return json_encode(['success' => 0, 'error' => 'Facebook authentication failed']);
-        }
-
-        if($success){
+        if($response){
             $values = array(
                 'fb_id' => $post->fb_id,
                 'fb_url' => $post->fb_url,

@@ -34,5 +34,6 @@ class FB extends Model{
             //return json_encode(array('message' => $e->getMessage()));
             Authentication::logout();
         }
+        return null;
     }
 }
