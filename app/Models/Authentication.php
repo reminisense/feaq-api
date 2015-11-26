@@ -16,7 +16,7 @@ class Authentication extends Model{
 
     public static function register($data){
         $post = json_decode(json_encode($data));
-        $response = FB::VerifyFB($post->accessToken);
+        $response = isset($post->accessToken) ? FB::VerifyFB($post->accessToken) : null;
         if($response){
             $values = array(
                 'fb_id' => $post->fb_id,
