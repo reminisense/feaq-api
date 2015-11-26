@@ -25,33 +25,33 @@ class BroadcastController extends Controller
    *
    * @apiParam {String} raw_code The 4 digit code or the personalized url of the business.
    *
-   * @apiSuccess (Success 200) {String} business_id The id of the image.
-   * @apiSuccess (Success 200) {String} adspace_size The space size of the advertisement image.
-   * @apiSuccess (Success 200) {String} numspace_size The space size of the broadcast numbers.
-   * @apiSuccess (Success 200) {Number} box_num The number of broadcast numbers to show on the screen.
-   * @apiSuccess (Success 200) {Number} get_num The available number for remote queuing.
-   * @apiSuccess (Success 200) {String} display The display type code.
-   * @apiSuccess (Success 200) {Boolean} show_issued The flag to show only called numbers or also the issued numbers.
-   * @apiSuccess (Success 200) {String} ad_video The video ad url.
-   * @apiSuccess (Success 200) {Boolean} turn_on_tv The flag to check if the tv is on.
-   * @apiSuccess (Success 200) {String} tv_channel The current channel of the tv.
-   * @apiSuccess (Success 200) {String} date The current date of business operations.
-   * @apiSuccess (Success 200) {String} ticker_message The first line of ticker message.
-   * @apiSuccess (Success 200) {String} ticker_message2 The second line of ticker message.
-   * @apiSuccess (Success 200) {String} ticker_message3 The third line of ticker message.
-   * @apiSuccess (Success 200) {String} ticker_message4 The fourth line of ticker message.
-   * @apiSuccess (Success 200) {String} ticker_message5 The fifth line of ticker message.
-   * @apiSuccess (Success 200) {String[]} ad_images An array containing the image advertisements of the business.
-   * @apiSuccess (Success 200) {String} open_hour The hour that the business opens.
-   * @apiSuccess (Success 200) {String} open_minute The minute that the business opens.
-   * @apiSuccess (Success 200) {String} open_ampm The ampm that the business opens.
-   * @apiSuccess (Success 200) {String} close_hour The hour that the business closes.
-   * @apiSuccess (Success 200) {String} close_minute The minute that the business closes.
-   * @apiSuccess (Success 200) {String} close_ampm The ampm that the business closes.
-   * @apiSuccess (Success 200) {String} local_address The address of the business.
-   * @apiSuccess (Success 200) {String} business_name The name of the business.
-   * @apiSuccess (Success 200) {String} first_service The default service of the business.
-   * @apiSuccess (Success 200) {String} keywords Some keywords used for broadcast meta data.
+   * @apiSuccess (200) {String} business_id The id of the image.
+   * @apiSuccess (200) {String} adspace_size The space size of the advertisement image.
+   * @apiSuccess (200) {String} numspace_size The space size of the broadcast numbers.
+   * @apiSuccess (200) {Number} box_num The number of broadcast numbers to show on the screen.
+   * @apiSuccess (200) {Number} get_num The available number for remote queuing.
+   * @apiSuccess (200) {String} display The display type code.
+   * @apiSuccess (200) {Boolean} show_issued The flag to show only called numbers or also the issued numbers.
+   * @apiSuccess (200) {String} ad_video The video ad url.
+   * @apiSuccess (200) {Boolean} turn_on_tv The flag to check if the tv is on.
+   * @apiSuccess (200) {String} tv_channel The current channel of the tv.
+   * @apiSuccess (200) {String} date The current date of business operations.
+   * @apiSuccess (200) {String} ticker_message The first line of ticker message.
+   * @apiSuccess (200) {String} ticker_message2 The second line of ticker message.
+   * @apiSuccess (200) {String} ticker_message3 The third line of ticker message.
+   * @apiSuccess (200) {String} ticker_message4 The fourth line of ticker message.
+   * @apiSuccess (200) {String} ticker_message5 The fifth line of ticker message.
+   * @apiSuccess (200) {String[]} ad_images An array containing the image advertisements of the business.
+   * @apiSuccess (200) {String} open_hour The hour that the business opens.
+   * @apiSuccess (200) {String} open_minute The minute that the business opens.
+   * @apiSuccess (200) {String} open_ampm The ampm that the business opens.
+   * @apiSuccess (200) {String} close_hour The hour that the business closes.
+   * @apiSuccess (200) {String} close_minute The minute that the business closes.
+   * @apiSuccess (200) {String} close_ampm The ampm that the business closes.
+   * @apiSuccess (200) {String} local_address The address of the business.
+   * @apiSuccess (200) {String} business_name The name of the business.
+   * @apiSuccess (200) {String} first_service The default service of the business.
+   * @apiSuccess (200) {String} keywords Some keywords used for broadcast meta data.
    * @apiSuccessExample {Json} Success-Response:
    *     HTTP/1.1 200 OK
    *     {
@@ -116,7 +116,7 @@ class BroadcastController extends Controller
    *       ]
    *     }
    *
-   * @apiError (Error 404) {String} NoBusinessFound No Businesses were found using the <code>raw_code</code>.
+   * @apiError (200) {String} NoBusinessFound No Businesses were found using the <code>raw_code</code>.
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 404 Not Found
    *     {
