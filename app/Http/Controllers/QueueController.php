@@ -32,7 +32,7 @@ class QueueController extends Controller {
    * @apiParam {Number} service_id The id of the service to queue.
    * @apiParam {Number} terminal_id The id of the terminal to queue.
    * @apiParam {String} queue_platform The platform where the queue is requested.
-   * @apiParam {String} priority_number The generated priority number.
+   * @apiParam {String} priority_number The number issued to the user.
    * @apiParam {String} name The full name of the user that is queuing.
    * @apiParam {String} phone The contact number of the user that is queuing.
    * @apiParam {String} email The email address of the user that is queuing.
@@ -172,7 +172,7 @@ class QueueController extends Controller {
         $terminal_name = '';
         if($number->terminal_id){
           try{
-            $terminal = Terminal::findOrFail($number->terminal_id);
+            $terminal = Terminal::where("terminal_id","=", $number->terminal_id)->first();
             $terminal_name = $terminal->name;
           }catch(Exception $e){
             $terminal_name = '';
