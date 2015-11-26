@@ -102,7 +102,7 @@ class Business extends Model
         return Business::where('name', 'LIKE', '%' . $keyword . '%')
             ->orWhere('local_address', 'LIKE', '%' . $keyword . '%')
             ->select(array('name', 'local_address'))
-            ->get()
+            ->get();
     }
     
     public static function getBusinessDetails($business_id)
