@@ -61,6 +61,9 @@ class Service extends Model
     public static function getFirstServiceOfBusiness($business_id)
     {
         $first_branch = Branch::getFirstBranchOfBusiness($business_id);
+        if(is_null($first_branch)) {
+            return null;
+        }
         return Service::getFirstServiceOfBranch($first_branch->branch_id);
     }
 }

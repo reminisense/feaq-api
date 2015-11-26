@@ -5,20 +5,15 @@
  * Date: 11/19/2015
  * Time: 11:01 AM
  */
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-
 class Queue extends Model{
-
 	public static function nextNumber($last_number_given, $number_start, $number_limit){
 		return ($last_number_given < $number_limit && $last_number_given != 0) ? $last_number_given + 1 : $number_start;
 	}
-
-    public static function queuedNumbers($service_id, $date, $start = 0, $take = 2147483648){
-        $query = DB::select('
+	public static function queuedNumbers($service_id, $date, $start = 0, $take = 2147483648){
+		$query = DB::select('
 			SELECT
 				n.*,
 				q.priority_number,
@@ -46,9 +41,8 @@ class Queue extends Model{
 				n.track_id
 			LIMIT ?, ?
 		', [$date, $service_id, $start, $take]);
-        return !empty($query) ? $query : [];
-    }
-
+		return !empty($query) ? $query : [];
+	}
 	public static function allNumbers($service_id, $terminal_id = null, $date = null){
 		$date = $date == null ? mktime(0, 0, 0, date('m'), date('d'), date('Y')) : $date;
 		$numbers = Queue::queuedNumbers($service_id, $date);
@@ -60,16 +54,12 @@ class Queue extends Model{
 		$processed_numbers = array();
 		$timebound_numbers = array(); //ARA Timebound assignment
 		$priority_numbers = new \stdClass();
-
 		if($numbers){
 			foreach($numbers as $number){
 				$called = $number->time_called != 0 ? TRUE : FALSE;
 				$served = $number->time_completed != 0 ? TRUE : FALSE;
 				$removed = $number->time_removed != 0 ? TRUE : FALSE;
-
 				$timebound = ($number->time_assigned) != 0 && ($number->time_assigned <= time()) ? TRUE : FALSE;
-
-
 				$terminal_name = '';
 				if($number->terminal_id){
 					try{
@@ -79,11 +69,9 @@ class Queue extends Model{
 						$terminal_name = '';
 					}
 				}
-
 				if($number->queue_platform != 'specific'){
 					$last_number_given = $number->priority_number;
 				}
-
 				/*legend*/
 				//uncalled  : not served and not removed
 				//called    : called, not served and not removed
@@ -91,7 +79,6 @@ class Queue extends Model{
 				//removed   : not called but removed
 				//served    : called and served
 				//processed : dropped/removed/served
-
 				if(!$called && !$removed && $timebound){
 					$timebound_numbers[] = array(
 						'transaction_number' => $number->transaction_number,
@@ -161,10 +148,8 @@ class Queue extends Model{
 					);
 				}
 			}
-
 			usort($processed_numbers, array('ProcessQueue', 'sortProcessedNumbers'));
 			usort($called_numbers, array('ProcessQueue', 'sortCalledNumbers'));
-
 			$priority_numbers->last_number_given = $last_number_given;
 			$priority_numbers->next_number = Queue::nextNumber($priority_numbers->last_number_given, QueueSettings::numberStart($service_id), QueueSettings::numberLimit($service_id));
 			$priority_numbers->current_number = $called_numbers ? $called_numbers[key($called_numbers)]['priority_number'] : 0;
@@ -183,7 +168,6 @@ class Queue extends Model{
 			$priority_numbers->processed_numbers = array_reverse($processed_numbers);
 			$priority_numbers->timebound_numbers = $timebound_numbers;
 		}
-
 		return $priority_numbers;
 	}
 }

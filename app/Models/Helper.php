@@ -6,23 +6,19 @@
  * Time: 3:25 PM
  */
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-
 class Helper extends Model{
     public static function parseTime($time)
     {
         $arr = explode(' ', $time);
         $hourmin = explode(':', $arr[0]);
-
         return [
             'hour' => trim($hourmin[0]),
             'min' => trim($hourmin[1]),
             'ampm' => trim($arr[1]),
         ];
     }
-
     /**
      * gets timezone offset and converts it to php timezone string
      * @param $offset
@@ -40,7 +36,6 @@ class Helper extends Model{
         }
         return false;
     }
-
     public static function timezoneOffsetToNameArray($offset)
     {
         $timezones = [];
@@ -54,12 +49,10 @@ class Helper extends Model{
         }
         return $timezones;
     }
-
     public static function doubleZero($number)
     {
         return $number == 0 ? '00' : $number;
     }
-
     public static function changeBusinessTimeTimezone($date, $business_timezone, $browser_timezone)
     {
         if (is_numeric($browser_timezone)) $browser_timezone = Helper::timezoneOffsetToName($browser_timezone);
@@ -67,19 +60,15 @@ class Helper extends Model{
         $datetime->setTimezone(new \DateTimeZone($browser_timezone));
         return $datetime->format('g:i A');
     }
-
     public static function millisecondsToHMSFormat($ms)
     {
         $second = $ms % 60;
         $ms = floor($ms / 60);
-
         $minute = $ms % 60;
         $ms = floor($ms / 60);
-
         $hour = $ms % 24;
         return Helper::formatTime($second, $minute, $hour);
     }
-
     public static function formatTime($second, $minute, $hour)
     {
         $time_string = '';
@@ -88,7 +77,6 @@ class Helper extends Model{
         $time_string .= $second > 0 ? $second . ' second(s) ' : '';
         return $time_string;
     }
-
     /**
      * requires an array of arrays
      * ex. 'field' => array('conditional_operator', 'value')

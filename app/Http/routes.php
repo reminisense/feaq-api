@@ -47,3 +47,6 @@ $app->get('broadcast/{business_id}', 'BroadcastController@show');
 $app->get('advertisements/{business_id}', 'AdvertisementController@advertisements');
 
 $app->post('queue/insert-number', 'QueueController@insertSpecific');
+
+// Landing Page API
+$app->post('business/search', 'LandingPageController@search');

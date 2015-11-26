@@ -175,6 +175,8 @@ class Analytics extends Model{
         return $average;
     }
 
+<<<<<<< Temporary merge branch 1
+=======
     public static function getTotalNumbersCalledByBusinessIdWithDate($business_id, $startdate, $enddate){
         return count(Analytics::getQueueAnalyticsRows(['action' => ['=', 1], 'business_id' => ['=', $business_id ], 'date' => ['>=', $startdate], 'date' => ['<=', $enddate]]));
     }
@@ -183,6 +185,7 @@ class Analytics extends Model{
      * ARA Computes for the time the next available number has to wait in order to be called
      * equation : time_to_be_called = average_calling_time x numbers_remaining_in_queue
      */
+>>>>>>> Temporary merge branch 2
     public static function getWaitingTime($business_id){
         $date = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
         $numbers_in_queue = Analytics::getBusinessRemainingCount($business_id);
