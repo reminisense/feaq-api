@@ -90,14 +90,14 @@ class UserController extends Controller
      * @apiParam {String} [phone] The modified contact number of user.
      * @apiParam {String} [local_address] The modified address of user.
      *
-     * @apiSuccess (200) {String} success The flag indicating the success/failure of update process. Returns 1 if process was successful.
+     * @apiSuccess (200) {String} success The flag indicating the success/failure of update process. Returns <code>1</code> if process was successful.
      * @apiSuccessExample {Json} Success-Response:
      *     HTTP/1.1 200 OK
      *     {
      *          "success" : 1
      *      }
      *
-     * @apiError (200) {Object} success The flag indicating the success/failure of update process. Returns 0 if process was not successful.
+     * @apiError (200) {Object} success The flag indicating the success/failure of update process. Returns <code>0</code> if process was not successful.
      * @apiError (200) {Object} UserNotFound There were no users found with the given <code>user_id</code>.
      * @apiError (200) {Object) SomethingWentWrong Something went wrong while saving your data.
      * @apiErrorExample {Json} Error-Response:
