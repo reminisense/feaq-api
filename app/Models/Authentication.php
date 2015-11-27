@@ -8,6 +8,7 @@
 
 namespace App\Models;
 
+use Facebook\Facebook;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -16,7 +17,7 @@ class Authentication extends Model{
 
     public static function register($data){
         $post = json_decode(json_encode($data));
-        $response = isset($post->accessToken) ? FB::VerifyFB($post->accessToken) : null;
+        $response = isset($post->accessToken) && isset($post->fb_id)? FB::VerifyFB($post->accessToken, $post->fb_id) : null;
         if($response){
             $values = array(
                 'fb_id' => $post->fb_id,
