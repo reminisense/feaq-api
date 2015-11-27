@@ -51,7 +51,7 @@ class BroadcastController extends Controller
    * @apiSuccess (200) {String} local_address The address of the business.
    * @apiSuccess (200) {String} business_name The name of the business.
    * @apiSuccess (200) {String} first_service The default service of the business.
-   * @apiSuccess (200) {String} keywords Some keywords used for broadcast meta data.
+   * @apiSuccess (200) {String[]} keywords Some keywords used for broadcast meta data.
    * @apiSuccessExample {Json} Success-Response:
    *     HTTP/1.1 200 OK
    *     {
@@ -120,7 +120,7 @@ class BroadcastController extends Controller
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 200 OK
    *     {
-   *       "err_message": "NoBusinessFound"
+   *       "err_code": "NoBusinessFound"
    *     }
    */
   public function getDetails($raw_code = '') {
@@ -179,7 +179,7 @@ class BroadcastController extends Controller
     }
     else {
       return json_encode(array(
-        'err_message' => 'NoBusinessFound',
+                  'err_code' => 'NoBusinessFound',
       ));
     }
   }
