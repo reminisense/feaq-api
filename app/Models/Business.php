@@ -95,13 +95,13 @@ class Business extends Model{
     {
         return Branch::businessId(Service::branchId($service_id));
     }
-    
-    public static function searchSuggest($keyword)
-    {
+
+    public static function searchSuggest($keyword){
         return Business::where('name', 'LIKE', '%' . $keyword . '%')
             ->orWhere('local_address', 'LIKE', '%' . $keyword . '%')
             ->select(array('name', 'local_address'))
-            ->get();
+            ->get()
+            ->toArray();
     }
     
     public static function getBusinessDetails($business_id)
@@ -214,7 +214,7 @@ class Business extends Model{
         $business->terminals = $terminals;
 
         return $business;
-        
+
     }
 
     public static function getBusinessByNameCountryIndustryTimeopen($name, $country, $industry, $time_open = null, $timezone = null)
@@ -222,10 +222,6 @@ class Business extends Model{
         //parse the time string
         if ($time_open) {
             $time_open_arr = Helper::parseTime($time_open);
-        } else {
-            $time_open_arr['hour'] = '';
-            $time_open_arr['min'] = '';
-            $time_open_arr['ampm'] = '';
         }
 
         //check for missing idustry values
@@ -233,7 +229,8 @@ class Business extends Model{
             $industry = '';
         }
 
-        if (is_numeric($timezone)) {
+        //check if timezone is numeric
+        if(is_numeric($timezone)){
             $timezones = Helper::timezoneOffsetToNameArray($timezone);
         }else{
             $timezones = [$timezone];
@@ -273,6 +270,7 @@ class Business extends Model{
                     ->where('open_hour', '<=', '12');
             }
         }
+
         return $query->get();
     }
 
@@ -304,9 +302,7 @@ class Business extends Model{
         $arr = array();
         foreach ($res as $count => $data) {
             $first_service = Service::getFirstServiceOfBusiness($data->business_id);
-            if (!is_null($first_service)) {
-                $all_numbers = Queue::allNumbers($first_service->service_id);
-            }
+            $all_numbers = Queue::allNumbers($first_service->service_id);
             $time_open = $data->open_hour . ':' . Helper::doubleZero($data->open_minute) . ' ' . strtoupper($data->open_ampm);
             $time_close = $data->close_hour . ':' . Helper::doubleZero($data->close_minute) . ' ' . strtoupper($data->close_ampm);
             $arr[] = array(
