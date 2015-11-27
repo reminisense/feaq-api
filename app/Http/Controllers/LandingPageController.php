@@ -29,8 +29,8 @@ class LandingPageController extends Controller
      * @apiParam {String} [keyword] The keyword used to search for the business.
      * @apiParam {String} [country] The country of the business.
      * @apiParam {String} [industry] The industry of the business.
-     * @apiParam {String} [time_open] The time the business opens.
-     * @apiParam {String} [timezone] The timezone of the business.
+     * @apiParam {String} [time_open] The time the business opens. (e.g. <code>11:00 AM</code>)
+     * @apiParam {String} [timezone] The timezone of the business. (e.g. <code>Asia/Singapore</code>)
      * @apiParam {Number} [limit] The maximum number of entries to be retrieved.
      * @apiParam {Number} [offset] The number where the entries retrieved will start.
      *
