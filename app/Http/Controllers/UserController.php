@@ -50,7 +50,7 @@ class UserController extends Controller
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 200 OK
    *     {
-   *       "err_message": "UserNotFound"
+   *       "err_code": "UserNotFound"
    *     }
    */
   public function fetchProfile($user_id) {
@@ -67,7 +67,7 @@ class UserController extends Controller
     }
     else {
       return json_encode(array(
-        'err_message' => 'NoUserFound',
+        'err_code' => 'NoUserFound',
       ));
     }
   }
@@ -104,7 +104,7 @@ class UserController extends Controller
      *     HTTP/1.1 200 OK
      *     {
      *          "success": "0",
-     *          "err_message": "UserNotFound"
+     *          "err_code": "UserNotFound"
      *     }
      */
     public function updateUser()
@@ -114,7 +114,7 @@ class UserController extends Controller
         if (is_null($user)) {
             return response()->json([
                 'success' => 0,
-                'err_message' => 'UserNotFound'
+                'err_code' => 'UserNotFound'
             ]);
         }
 
@@ -130,7 +130,7 @@ class UserController extends Controller
         } else {
             return response()->json([
                 'success' => 0,
-                'err_message' => 'SomethingWentWrong'
+                'err_code' => 'SomethingWentWrong'
             ]);
         }
     }
