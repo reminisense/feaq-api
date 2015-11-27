@@ -60,7 +60,11 @@ class Terminal extends Model
     }
 
     public static function serviceId($terminal_id){
-        return Terminal::find($terminal_id)->service_id;
+        if(Terminal::find($terminal_id)){
+            return Terminal::find($terminal_id)->service_id;
+        }else{
+            return null;
+        }
     }
 
     public static function getTerminalsByBranchId($branch_id){

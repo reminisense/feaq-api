@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 use App\Models\PriorityQueue;
 use App\Models\QueueSettings;
 use App\Models\PriorityNumber;
+use App\Models\Service;
 use App\Models\TerminalTransaction;
 use App\Models\Terminal;
 use Illuminate\Support\Facades\Input;
@@ -31,18 +32,18 @@ class QueueController extends Controller {
    *
    * @apiParam {Number} service_id The id of the service to queue.
    * @apiParam {Number} terminal_id The id of the terminal to queue.
-   * @apiParam {String} queue_platform The platform where the queue is requested.
+   * @apiParam {String="web","remote","android","specific"} queue_platform The platform where the queue is requested. <code>Web</code> is generated from the web app. <code>Remote</code> is from remote queueing-web app. <code>Android</code> is from remote queueing-Android app. <code>Specific</code> is from the process queue-issue specific number.
    * @apiParam {String} priority_number The number issued to the user.
    * @apiParam {String} name The full name of the user that is queuing.
    * @apiParam {String} phone The contact number of the user that is queuing.
    * @apiParam {String} email The email address of the user that is queuing.
-   * @apiParam {String} date The timestamp format of the date the queue is requested.
-   * @apiParam {String} user_id The id of the user requesting the queue.
-   * @apiParam {String} time_assigned The time on which the queue was inserted to the database.
+   * @apiParam {String} date The timestamp format (<code>mktime(0, 0, 0, date('m'), date('d'), date('Y'))</code>) of the date the queue is requested.
+   * @apiParam {Number} user_id The id of the user requesting the queue.
+   * @apiParam {String} [time_assigned] The time (time()) on which the queue was inserted to the database.
    *
    * @apiSuccess (200) {String} success The boolean flag of the successful process.
    * @apiSuccess (200) {String[]} number An array containing the information about the current transaction.
-   * @apiSuccess (200) {String} transaction_number The id of the current transaction.
+   * @apiSuccess (200) {Number} transaction_number The id of the current transaction.
    * @apiSuccess (200) {String} priority_number The number given to the user.
    * @apiSuccess (200) {String} confirmation_code The code given to the user along with the priority number for validation.
    * @apiSuccessExample {Json} Success-Response:
@@ -58,7 +59,8 @@ class QueueController extends Controller {
    *       },
    *     ]
    *
-   * @apiError (200) {String} TransactionInvalid The transaction is invalid.
+   * @apiError (200) {String} InvalidTransaction The transaction is invalid.
+   * @apiError (200) {String} InvalidMember The terminal id is not owned of the service.
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 200 OK
    *     [
@@ -66,7 +68,7 @@ class QueueController extends Controller {
    *          "success": 0
    *       },
    *       {
-   *         "err_message": "TransactionInvalid"
+   *         "err_code": "InvalidTransaction"
    *       },
    *     ]
    */
@@ -81,17 +83,21 @@ class QueueController extends Controller {
     $date = Input::get('date');
     $user_id = Input::get('user_id');
     $time_assigned = Input::get('time_assigned');
-    //$number = ProcessQueue::issueNumber($service_id, $priority_number, null, $queue_platform, $terminal_id);
-    $number = $this->issueNumber($service_id, $priority_number, $date, $queue_platform, $terminal_id, $user_id);
-    if ($number) {
-      PriorityQueue::updatePriorityQueueUser($number['transaction_number'], $name, $phone, $email);
-      TerminalTransaction::where('transaction_number', '=', $number['transaction_number'])
-        ->update(['time_assigned' => $time_assigned]);
-      return json_encode(['success' => 1, 'number' => $number]);
-    }
-    else {
-      return json_encode(['success' => 0, 'err_message' => "TransactionInvalid"]);
-    }
+      if($service_id == Terminal::serviceId($terminal_id)) {
+          //$number = ProcessQueue::issueNumber($service_id, $priority_number, null, $queue_platform, $terminal_id);
+          $number = $this->issueNumber($service_id, $priority_number, $date, $queue_platform, $terminal_id, $user_id);
+          if ($number) {
+              PriorityQueue::updatePriorityQueueUser($number['transaction_number'], $name, $phone, $email);
+              TerminalTransaction::where('transaction_number', '=', $number['transaction_number'])
+                  ->update(['time_assigned' => $time_assigned]);
+              return json_encode(['success' => 1, 'number' => $number]);
+          }
+          else {
+              return json_encode(['success' => 0, 'err_code' => "InvalidTransaction"]);
+          }
+      }else{
+          return json_encode(['success' => 0, 'err_code' => "InvalidMember"]);
+      }
   }
 
   private function issueNumber($service_id, $priority_number = null, $date = null, $queue_platform = 'web', $terminal_id = 0, $user_id = null){
