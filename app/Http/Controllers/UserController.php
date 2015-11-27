@@ -87,24 +87,24 @@ class UserController extends Controller
      * @apiParam {Number} user_id The id of the user.
      * @apiParam {String} first_name The modified first name of user.
      * @apiParam {String} last_name The modified last name of user.
-     * @apiParam {String} phone The modified contact number of user.
-     * @apiParam {String} local_address The modified address of user.
+     * @apiParam {String} [phone] The modified contact number of user.
+     * @apiParam {String} [local_address] The modified address of user.
      *
-     * @apiSuccess (200) {String} success The flag indicating the success/failure of update process. Returns 1 if process was successful, 0 otherwise.
+     * @apiSuccess (200) {String} success The flag indicating the success/failure of update process. Returns 1 if process was successful.
      * @apiSuccessExample {Json} Success-Response:
      *     HTTP/1.1 200 OK
      *     {
      *          "success" : 1
      *      }
      *
-     * @apiError (200) {Object} success The flag indicating the success/failure of update process. Returns 1 if process was successful, 0 otherwise.
-     * @apiError (200) {Object} NoUserFound There are no users with the given user_id.
+     * @apiError (200) {Object} success The flag indicating the success/failure of update process. Returns 0 if process was not successful.
+     * @apiError (200) {Object} UserNotFound There were no users found with the given <code>user_id</code>.
      * @apiError (200) {Object) SomethingWentWrong Something went wrong while saving your data.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
      *          "success": "0",
-     *          "err_message": "NoUserFound"
+     *          "err_message": "UserNotFound"
      *     }
      */
     public function updateUser()
@@ -114,7 +114,7 @@ class UserController extends Controller
         if (is_null($user)) {
             return response()->json([
                 'success' => 0,
-                'err_message' => 'NoUserFound'
+                'err_message' => 'UserNotFound'
             ]);
         }
 
