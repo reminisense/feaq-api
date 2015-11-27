@@ -21,14 +21,14 @@ class BusinessController extends Controller
      *      http://api.featherq.com/business/search?keyword=&country=&industry=&time_open=&timezone=&limit=&offset
      * @apiDescription Search for businesses based on the given parameters.
      *
-     * @apiHeader none
+     * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission none
      *
-     * @apiParam {String} [keyword] The keyword used to search for the business.
+     * @apiParam {String} [keyword] The keyword or name used to search for the business.
      * @apiParam {String} [country] The country of the business.
      * @apiParam {String} [industry] The industry of the business.
-     * @apiParam {String} [time_open] The time the business opens.
-     * @apiParam {String} [timezone] The timezone of the business.
+     * @apiParam {String} [time_open] The time the business opens. (e.g. <code>11:00 AM</code>)
+     * @apiParam {String} [timezone] The timezone of the business. (e.g. <code>Asia/Singapore</code>)
      * @apiParam {Number} [limit] The maximum number of entries to be retrieved.
      * @apiParam {Number} [offset] The number where the entries retrieved will start.
      *
