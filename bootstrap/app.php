@@ -2,7 +2,7 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-// Dotenv::load(__DIR__.'/../');
+Dotenv::load(__DIR__.'/../');
 
 /*
 |--------------------------------------------------------------------------
@@ -19,9 +19,11 @@ $app = new Laravel\Lumen\Application(
     realpath(__DIR__.'/../')
 );
 
-// $app->withFacades();
+//class_alias('Illuminate\Support\Facades\Config', 'Config');
 
-// $app->withEloquent();
+$app->withFacades();
+
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -95,5 +97,23 @@ $app->singleton(
 $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
     require __DIR__.'/../app/Http/routes.php';
 });
+
+$app->register('LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider');
+$app->register('Optimus\OAuth2Server\OAuth2ServerServiceProvider');
+
+$app->middleware([
+  'LucaDegasperi\OAuth2Server\Middleware\OAuthExceptionHandlerMiddleware',
+  'Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse'  // <--- added
+]);
+
+$app->routeMiddleware([
+  'check-authorization-params' => 'Optimus\OAuth2Server\Middleware\CheckAuthCodeRequestMiddleware',
+  'csrf' => 'Laravel\Lumen\Http\Middleware\VerifyCsrfToken',
+  'oauth' => 'Optimus\OAuth2Server\Middleware\OAuthMiddleware',
+  'oauth-owner' => 'Optimus\OAuth2Server\Middleware\OAuthOwnerMiddleware'
+]);
+
+$app->configure('app');
+$app->configure('secrets');
 
 return $app;
