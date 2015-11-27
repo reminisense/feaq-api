@@ -26,10 +26,10 @@ class AuthenticationController extends Controller
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission none
      *
-     * @apiParam {String} fb_id User's Facebook id provided by the Facebook javascript API.
+     * @apiParam {Number} fb_id User's Facebook id provided by the Facebook javascript API.
      * @apiParam {String} [click_source] The location of the button (e.g. landing_page_top_right), where the user logged in.
      *
-     * @apiSuccess (200) {String} success Returns <code>1</code> if the login is successful.
+     * @apiSuccess (200) {Number} success Returns <code>1</code> if the login is successful.
      * @apiSuccess (200) {String} accessToken The access key to remember the session.
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK
@@ -38,7 +38,7 @@ class AuthenticationController extends Controller
      *          "accessToken": "123123drink123123drink"
      *      }
      *
-     * @apiError (200) {String} success Returns <code>0</code> if the login fails.
+     * @apiError (200) {Number} success Returns <code>0</code> if the login fails.
      * @apiError (200) {String} MissingValue Missing <code>fb_id</code> upon request.
      * @apiError (200) {String} SignUpRequired User with <code>fb_id</code> has not yet registered to Featherq.
      * @apiErrorExample {Json} Error-response:
@@ -65,7 +65,7 @@ class AuthenticationController extends Controller
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission none
      *
-     * @apiSuccess (200) {String} success Returns <code>1</code> if the logout is successful.
+     * @apiSuccess (200) {Number} success Returns <code>1</code> if the logout is successful.
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK
      *      {
@@ -90,7 +90,7 @@ class AuthenticationController extends Controller
      * @apiPermission none
      *
      * @apiParam {String} accessToken The facebook access token (provided by the Facebook javascript API).
-     * @apiParam {String} fb_id User's facebook id (provided by the Facebook javascript API).
+     * @apiParam {Number} fb_id User's facebook id (provided by the Facebook javascript API).
      * @apiParam {String} fb_url User's facebook url (provided by the Facebook javascript API).
      * @apiParam {String} first_name User's first name (provided by the Facebook javascript API).
      * @apiParam {String} last_name User's last name (provided by the Facebook javascript API).
@@ -98,7 +98,7 @@ class AuthenticationController extends Controller
      * @apiParam {String} gender User's gender (provided by the Facebook javascript API).
      * @apiParam {String} [click_source] The location of the button (e.g. landing_page_top_right), where the user logged in to Featherq.
      *
-     * @apiSuccess (200) {String} success Returns <code>1</code> if the sign up is successful.
+     * @apiSuccess (200) {Number} success Returns <code>1</code> if the sign up is successful.
      * @apiSuccess (200) {String} accessToken The access key to remember the session.
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK
@@ -107,8 +107,8 @@ class AuthenticationController extends Controller
      *          "accessToken": "123123drink123123drink"
      *      }
      *
-     * @apiError (200) {String} success Returns <code>0</code> if registration fails.
-     * @apiError (200) {String} AuthenticationFailed Invalid access token.
+     * @apiError (200) {Number} success Returns <code>0</code> if registration fails.
+     * @apiError (200) {String} AuthenticationFailed Invalid <code>accessToken</code> or <code>fb_id</code>.
      * @apiErrorExample {Json} Error-response:
      *      HTTP/1.1 200 OK
      *      {

@@ -46,7 +46,6 @@ class LandingPageController extends Controller
      * @apiSuccess (200) {Number} business.last_active The number of days when the business last processed the queue.
      * @apiSuccess (200) {Boolean} business.card_bool Indicates if the business is active or not.
      *
-     * @apiSuccess (200) {Array} list of businesses matching search parameters.
      * @apiSuccessExample {Json} Success-Response:
      *     [{
      *          "business_id": 9,

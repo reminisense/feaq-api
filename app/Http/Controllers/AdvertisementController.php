@@ -22,8 +22,8 @@ class AdvertisementController extends Controller {
    * @apiSuccess (200) {Object[]} ad_images The array of images found on the broadcast screen.
    * @apiSuccess (200) {Number} ad_images.img_id The id of the image.
    * @apiSuccess (200) {String} ad_images.path The filesystem path of the image.
-   * @apiSuccess (200) {String} ad_images.weight The weight/place of the image.
-   * @apiSuccess (200) {String} ad_images.business_id The id of the business to which the image belongs.
+   * @apiSuccess (200) {Number} ad_images.weight The weight/place of the image.
+   * @apiSuccess (200) {Number} ad_images.business_id The id of the business to which the image belongs.
    * @apiSuccessExample {Json} Success-Response:
    *     HTTP/1.1 200 OK
    *     [

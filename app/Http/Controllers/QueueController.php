@@ -41,8 +41,7 @@ class QueueController extends Controller {
    * @apiParam {Number} user_id The id of the user requesting the queue.
    * @apiParam {String} [time_assigned] The time (time()) on which the queue was inserted to the database.
    *
-   * @apiSuccess (200) {String} success The boolean flag of the successful process.
-   * @apiSuccess (200) {String[]} number An array containing the information about the current transaction.
+   * @apiSuccess (200) {Number} success The boolean flag of the successful process.
    * @apiSuccess (200) {Number} transaction_number The id of the current transaction.
    * @apiSuccess (200) {String} priority_number The number given to the user.
    * @apiSuccess (200) {String} confirmation_code The code given to the user along with the priority number for validation.
@@ -56,7 +55,7 @@ class QueueController extends Controller {
    *         "transaction_number": 73123122,
    *         "priority_number": "21",
    *         "confirmation_code": 1GHB3JS987
-   *       },
+   *       }
    *     ]
    *
    * @apiError (200) {String} InvalidTransaction The transaction is invalid.

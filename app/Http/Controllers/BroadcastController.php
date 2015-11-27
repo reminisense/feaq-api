@@ -25,7 +25,7 @@ class BroadcastController extends Controller
    *
    * @apiParam {String} raw_code The 4 digit code or the personalized url of the business.
    *
-   * @apiSuccess (200) {String} business_id The id of the image.
+   * @apiSuccess (200) {Number} business_id The id of the business which owns the broadcast screen.
    * @apiSuccess (200) {String} adspace_size The space size of the advertisement image.
    * @apiSuccess (200) {String} numspace_size The space size of the broadcast numbers.
    * @apiSuccess (200) {Number} box_num The number of broadcast numbers to show on the screen.
