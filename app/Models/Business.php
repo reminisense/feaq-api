@@ -10,8 +10,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Business extends Model
-{
+class Business extends Model{
 
     protected $table = 'business';
     protected $primaryKey = 'business_id';
@@ -215,10 +214,12 @@ class Business extends Model
         $business->terminals = $terminals;
 
         return $business;
+        
     }
 
     public static function getBusinessByNameCountryIndustryTimeopen($name, $country, $industry, $time_open = null, $timezone = null)
     {
+        //parse the time string
         if ($time_open) {
             $time_open_arr = Helper::parseTime($time_open);
         } else {
@@ -227,6 +228,7 @@ class Business extends Model
             $time_open_arr['ampm'] = '';
         }
 
+        //check for missing idustry values
         if ($industry == 'Industry') {
             $industry = '';
         }
@@ -255,7 +257,7 @@ class Business extends Model
         }
 
         //query timezone if name is not given
-        if($name == ''){
+        if($timezone){
             $query->whereIn('timezone', $timezones);
         }
 
@@ -280,7 +282,7 @@ class Business extends Model
             'industry'  => isset($get['industry']) ? $get['industry'] : '',
             'country'   => isset($get['country']) && $get['country'] != '' ? $get['country'] : 'Philippines',
             'time_open' => isset($get['time_open']) && $get['time_open'] != '' ? $get['time_open'] : null,
-            'timezone'  => isset($get['user_timezone']) && $get['timezone'] != '' ? $get['user_timezone'] : 'Asia/Manila',
+            'timezone'  => isset($get['user_timezone']) && $get['timezone'] != '' ? $get['user_timezone'] : null,
             'limit'     => isset($get['limit']) && $get['limit'] != '' ? (int) $get['limit'] : 8,
             'offset'    => isset($get['offset']) && $get['offset'] != '' ? (int) $get['offset'] : 0,
         ];
