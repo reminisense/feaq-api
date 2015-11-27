@@ -19,10 +19,11 @@ class AdvertisementController extends Controller {
    *
    * @apiParam {Number} business_id The id of the business.
    *
-   * @apiSuccess (200) {String} img_id The id of the image.
-   * @apiSuccess (200) {String} path The filesystem path of the image.
-   * @apiSuccess (200) {String} weight The weight/place of the image.
-   * @apiSuccess (200) {String} business_id The id of the business to which the image belongs.
+   * @apiSuccess (200) {Object[]} ad_images The array of images found on the broadcast screen.
+   * @apiSuccess (200) {Number} ad_images.img_id The id of the image.
+   * @apiSuccess (200) {String} ad_images.path The filesystem path of the image.
+   * @apiSuccess (200) {String} ad_images.weight The weight/place of the image.
+   * @apiSuccess (200) {String} ad_images.business_id The id of the business to which the image belongs.
    * @apiSuccessExample {Json} Success-Response:
    *     HTTP/1.1 200 OK
    *     [
@@ -54,7 +55,7 @@ class AdvertisementController extends Controller {
     }
     else {
       return json_encode(array(
-        'err_code' => 'NoImagesFound',
+        'err_code' => 'NoImagesFound'
       ));
     }
   }
