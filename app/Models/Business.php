@@ -248,6 +248,7 @@ class Business extends Model{
                 ->where('longitude', '>=', $country['sw_lng']);
         }
 
+        var_dump($timezone);
         //query for industry
         if($industry != ''){
             $query->where('industry', 'LIKE', '%' . $industry . '%');
@@ -278,9 +279,9 @@ class Business extends Model{
         $values = [
             'keyword'   => isset($get['keyword']) ? $get['keyword'] : '',
             'industry'  => isset($get['industry']) ? $get['industry'] : '',
-            'country'   => isset($get['country']) && $get['country'] != '' ? $get['country'] : 'Philippines',
+            'country'   => isset($get['country']) && $get['country'] != '' ? $get['country'] : null,
             'time_open' => isset($get['time_open']) && $get['time_open'] != '' ? $get['time_open'] : null,
-            'timezone'  => isset($get['user_timezone']) && $get['timezone'] != '' ? $get['user_timezone'] : null,
+            'timezone'  => isset($get['timezone']) && $get['timezone'] != '' ? $get['timezone'] : null,
             'limit'     => isset($get['limit']) && $get['limit'] != '' ? (int) $get['limit'] : 8,
             'offset'    => isset($get['offset']) && $get['offset'] != '' ? (int) $get['offset'] : 0,
         ];
@@ -297,6 +298,7 @@ class Business extends Model{
         }else{
             $values->location = [];
         }
+        var_dump($values->timezone);
         $res = Business::getBusinessByNameCountryIndustryTimeopen($values->keyword, $values->location, $values->industry, $values->time_open, $values->timezone);
 
         $arr = array();
