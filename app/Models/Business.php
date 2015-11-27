@@ -215,12 +215,6 @@ class Business extends Model{
 
         return $business;
 
-    public static function searchSuggest($keyword){
-        return Business::where('name', 'LIKE', '%' . $keyword . '%')
-            ->orWhere('local_address', 'LIKE', '%' . $keyword . '%')
-            ->select(array('name', 'local_address'))
-            ->get()
-            ->toArray();
     }
 
     public static function getBusinessByNameCountryIndustryTimeopen($name, $country, $industry, $time_open = null, $timezone = null)
@@ -260,7 +254,7 @@ class Business extends Model{
         }
 
         //query timezone if name is not given
-        if($name == ''){
+        if($timezone){
             $query->whereIn('timezone', $timezones);
         }
 
@@ -286,7 +280,7 @@ class Business extends Model{
             'industry'  => isset($get['industry']) ? $get['industry'] : '',
             'country'   => isset($get['country']) && $get['country'] != '' ? $get['country'] : 'Philippines',
             'time_open' => isset($get['time_open']) && $get['time_open'] != '' ? $get['time_open'] : null,
-            'timezone'  => isset($get['user_timezone']) && $get['timezone'] != '' ? $get['user_timezone'] : 'Asia/Manila',
+            'timezone'  => isset($get['user_timezone']) && $get['timezone'] != '' ? $get['user_timezone'] : null,
             'limit'     => isset($get['limit']) && $get['limit'] != '' ? (int) $get['limit'] : 8,
             'offset'    => isset($get['offset']) && $get['offset'] != '' ? (int) $get['offset'] : 0,
         ];

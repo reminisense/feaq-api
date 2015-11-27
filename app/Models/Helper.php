@@ -62,6 +62,7 @@ class Helper extends Model{
 
     public static function changeBusinessTimeTimezone($date, $business_timezone, $browser_timezone)
     {
+        $browser_timezone = $browser_timezone != null ? $browser_timezone : $business_timezone;
         if (is_numeric($browser_timezone)) $browser_timezone = Helper::timezoneOffsetToName($browser_timezone);
         $datetime = new \DateTime($date, new \DateTimeZone($business_timezone));
         $datetime->setTimezone(new \DateTimeZone($browser_timezone));
