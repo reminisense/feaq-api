@@ -44,7 +44,7 @@ class AdvertisementController extends Controller {
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 200 OK
    *     {
-   *       "err_message": "NoImagesFound"
+   *       "err_code": "NoImagesFound"
    *     }
    */
   public function getImages($business_id = 0) {
@@ -54,7 +54,7 @@ class AdvertisementController extends Controller {
     }
     else {
       return json_encode(array(
-        'err_message' => 'NoImagesFound',
+        'err_code' => 'NoImagesFound',
       ));
     }
   }
