@@ -23,11 +23,11 @@ class AuthenticationController extends Controller
      *      http://api.featherq.com/login
      * @apiDescription Checks for the user in the database and returns an access key.
      *
-     * @apiHeader none
+     * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission none
      *
      * @apiParam {String} fb_id User's Facebook id provided by the Facebook javascript API.
-     * @apiParam {String} click_source The location of the button (e.g. landing_page_top_right), where the user logged in to Featherq.
+     * @apiParam {String} [click_source] The location of the button (e.g. landing_page_top_right), where the user logged in.
      *
      * @apiSuccess (200) {String} success Returns <code>1</code> if the login is successful.
      * @apiSuccess (200) {String} accessToken The access key to remember the session.
@@ -39,12 +39,13 @@ class AuthenticationController extends Controller
      *      }
      *
      * @apiError (200) {String} success Returns <code>0</code> if the login fails.
-     * @apiError (200) {String} SignUpRequired User has not registered to Featherq.
+     * @apiError (200) {String} MissingValue Missing <code>fb_id</code> upon request.
+     * @apiError (200) {String} SignUpRequired User with <code>fb_id</code> has not yet registered to Featherq.
      * @apiErrorExample {Json} Error-response:
      *      HTTP/1.1 200
      *      {
      *          "success": 0,
-     *          "err_message": "SignUpRequired"
+     *          "err_code": "SignUpRequired"
      *      }
      *
      */
@@ -61,26 +62,15 @@ class AuthenticationController extends Controller
      *      http://api.featherq.com/logout
      * @apiDescription Forgets the user's session from the app.
      *
-     * @apiHeader none
+     * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission none
      *
-     * @apiSuccess (200) {String} success Returns <code>1</code> if the login is successful.
+     * @apiSuccess (200) {String} success Returns <code>1</code> if the logout is successful.
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK
      *      {
      *          "success": 1
      *      }
-     *
-     * @apiError (200) {String} success Returns 0 success if failed
-     * @apiError (200) {String} error The body of the error message
-     * @apiErrorExample {Json} Error-response:
-     *      HTTP/1.1 200
-     *      {
-     *          "success": 0,
-     *          "error": "Facebook authentication failed"
-     *      }
-     *
-     *
      */
     public function logout(){
         return Authentication::logout();
@@ -96,7 +86,7 @@ class AuthenticationController extends Controller
      *      http://api.featherq.com/user/register
      * @apiDescription Registers a new user to the database.
      *
-     * @apiHeader none
+     * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission none
      *
      * @apiParam {String} accessToken The facebook access token (provided by the Facebook javascript API).
@@ -106,7 +96,7 @@ class AuthenticationController extends Controller
      * @apiParam {String} last_name User's last name (provided by the Facebook javascript API).
      * @apiParam {String} email User's email (provided by the Facebook javascript API).
      * @apiParam {String} gender User's gender (provided by the Facebook javascript API).
-     * @apiParam {String} click_source The location of the button (e.g. landing_page_top_right), where the user logged in to Featherq.
+     * @apiParam {String} [click_source] The location of the button (e.g. landing_page_top_right), where the user logged in to Featherq.
      *
      * @apiSuccess (200) {String} success Returns <code>1</code> if the sign up is successful.
      * @apiSuccess (200) {String} accessToken The access key to remember the session.
@@ -117,13 +107,13 @@ class AuthenticationController extends Controller
      *          "accessToken": "123123drink123123drink"
      *      }
      *
-     * @apiError (200) {String} success Returns 0 success if failed
-     * @apiError (200) {String} error The body of the error message
+     * @apiError (200) {String} success Returns <code>0</code> if registration fails.
+     * @apiError (200) {String} AuthenticationFailed Invalid access token.
      * @apiErrorExample {Json} Error-response:
-     *      HTTP/1.1 200
+     *      HTTP/1.1 200 OK
      *      {
      *          "success": 0,
-     *          "error": "Please sign up to Featherq"
+     *          "err_code": "AuthenticationFailed"
      *      }
      *
      */

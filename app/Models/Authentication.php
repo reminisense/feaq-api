@@ -34,20 +34,25 @@ class Authentication extends Model{
 
             return Authentication::login($values['fb_id'], $post->click_source);
         }else{
-            return json_encode(['success' => 0, 'error' => 'Facebook authentication failed']);
+            return json_encode(['success' => 0, 'err_code' => 'AuthenticationFailed']);
         }
     }
 
     public static function login($fb_id, $click_source){
-        if(User::checkFBUser($fb_id)){
-            //@todo generate access token
-            $accessToken = '';
-            Session::put('accessToken', $accessToken);
-            Watchdog::createRecord(['action_type' => 'authentication', 'value' => serialize(['action'=> 'login', 'success' => true, 'click_source' => $click_source])]); //save to watchdog the source of login
-            return json_encode(['success' => 1, 'accessToken' => $accessToken]);
+
+        if($fb_id){
+            if(User::checkFBUser($fb_id)){
+                //@todo generate access token
+                $accessToken = '';
+                Session::put('accessToken', $accessToken);
+                Watchdog::createRecord(['action_type' => 'authentication', 'value' => serialize(['action'=> 'login', 'success' => true, 'click_source' => $click_source])]); //save to watchdog the source of login
+                return json_encode(['success' => 1, 'accessToken' => $accessToken]);
+            }else{
+                Watchdog::createRecord(['action_type' => 'authentication', 'value' => serialize(['action'=> 'login', 'success' => false, 'click_source' => $click_source])]); //save to watchdog the source of login
+                return json_encode(['success' => 0, 'err_code' => 'SignUpRequired']);
+            }
         }else{
-            Watchdog::createRecord(['action_type' => 'authentication', 'value' => serialize(['action'=> 'login', 'success' => false, 'click_source' => $click_source])]); //save to watchdog the source of login
-            return json_encode(['success' => 0, 'error' => 'Please sign up to Featherq']);
+            return json_encode(['success' => 0, 'err_code' => 'MissingValue']);
         }
     }
 
