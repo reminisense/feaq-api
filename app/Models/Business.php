@@ -248,7 +248,6 @@ class Business extends Model{
                 ->where('longitude', '>=', $country['sw_lng']);
         }
 
-        var_dump($timezone);
         //query for industry
         if($industry != ''){
             $query->where('industry', 'LIKE', '%' . $industry . '%');
@@ -298,7 +297,7 @@ class Business extends Model{
         }else{
             $values->location = [];
         }
-        var_dump($values->timezone);
+
         $res = Business::getBusinessByNameCountryIndustryTimeopen($values->keyword, $values->location, $values->industry, $values->time_open, $values->timezone);
 
         $arr = array();
