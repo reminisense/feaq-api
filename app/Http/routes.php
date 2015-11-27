@@ -42,7 +42,6 @@ $app->get('business/search-suggest/{keyword}', 'BusinessController@searchSuggest
 $app->get('business/search', 'BusinessController@search');
 
 //Broadcast routes
-$app->get('broadcast/{business_id}', 'BroadcastController@show');
 
 $app->get('advertisements/{business_id}', 'AdvertisementController@advertisements');
 
