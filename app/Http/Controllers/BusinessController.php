@@ -68,7 +68,7 @@ class BusinessController extends Controller
     }
 
     /**
-     * @api {get} /business/search-suggest/{keyword} Search Suggestion
+     * @api {get} /business/search-suggest/{keyword} Search Suggestions
      * @apiName SearchSuggest
      * @apiGroup Business
      * @apiVersion 1.0.0
@@ -76,14 +76,14 @@ class BusinessController extends Controller
      *      http://api.featherq.com/business/search-suggest/keyword
      * @apiDescription Suggests search items for businesses based on the given keyword.
      *
-     * @apiHeader none
+     * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission none
      *
      * @apiParam {String} keyword The keyword used to search for the business.
      *
-     * @apiSuccess (200) {Object[]} business Array of objects with business details
-     * @apiSuccess (200) {String} business.business_name The name of the business
-     * @apiSuccess (200) {String} business.local_address The address of the business
+     * @apiSuccess (200) {Object[]} business Array of objects with business details.
+     * @apiSuccess (200) {String} business.business_name The name of the business.
+     * @apiSuccess (200) {String} business.local_address The address of the business.
      *
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK
@@ -97,6 +97,6 @@ class BusinessController extends Controller
      */
     public function searchSuggest($keyword){
         $businesses = Business::searchSuggest($keyword);
-        return json_encode(array('businesses' => $businesses));
+        return json_encode($businesses);
     }
 }
