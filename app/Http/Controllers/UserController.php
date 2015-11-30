@@ -24,7 +24,7 @@ class UserController extends Controller
    * @apiDescription Gets all the information pertaining to the user.
    *
    * @apiHeader {String} access-key The unique access key sent by the client.
-   * @apiPermission Current User & Admin
+   * @apiPermission Authenticated User
    *
    * @apiParam {Number} user_id The id of the user.
    *
@@ -46,7 +46,7 @@ class UserController extends Controller
    *       "local_address": "Disneyland, Hongkong"
    *     }
    *
-   * @apiError (200) {String} UserNotFound There were no users found with the given <code>user_id</code>.
+   * @apiError (Error) {String} UserNotFound There were no users found with the given <code>user_id</code>.
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 200 OK
    *     {
@@ -82,7 +82,7 @@ class UserController extends Controller
      * @apiDescription Update user information using the information given from JSON.
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
-     * @apiPermission Current User & Admin
+     * @apiPermission Authenticated User
      *
      * @apiParam {Number} user_id The id of the user.
      * @apiParam {String} first_name The modified first name of user.
@@ -97,9 +97,9 @@ class UserController extends Controller
      *          "success" : 1
      *      }
      *
-     * @apiError (200) {Number} success The flag indicating the success/failure of update process. Returns <code>0</code> if process was not successful.
-     * @apiError (200) {String} UserNotFound There were no users found with the given <code>user_id</code>.
-     * @apiError (200) {String) SomethingWentWrong Something went wrong while saving your data.
+     * @apiError (Error) {Number} success The flag indicating the success/failure of update process. Returns <code>0</code> if process was not successful.
+     * @apiError (Error) {String} UserNotFound There were no users found with the given <code>user_id</code>.
+     * @apiError (Error) {String) SomethingWentWrong Something went wrong while saving your data.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {

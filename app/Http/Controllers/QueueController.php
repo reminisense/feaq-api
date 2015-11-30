@@ -39,7 +39,7 @@ class QueueController extends Controller {
    * @apiParam {String} email The email address of the user that is queuing.
    * @apiParam {String} date The timestamp format (<code>mktime(0, 0, 0, date('m'), date('d'), date('Y'))</code>) of the date the queue is requested.
    * @apiParam {Number} user_id The id of the user requesting the queue.
-   * @apiParam {String} [time_assigned] The time (time()) on which the queue was inserted to the database.
+   * @apiParam {String} [time_assigned] The time (<code>time()</code>) on which the queue was inserted to the database.
    *
    * @apiSuccess (200) {Number} success The boolean flag of the successful process.
    * @apiSuccess (200) {Number} transaction_number The id of the current transaction.
@@ -58,8 +58,8 @@ class QueueController extends Controller {
    *       }
    *     ]
    *
-   * @apiError (200) {String} InvalidTransaction The transaction is invalid.
-   * @apiError (200) {String} InvalidMember The terminal id is not owned of the service.
+   * @apiError (Error) {String} InvalidTransaction The transaction is invalid.
+   * @apiError (Error) {String} InvalidMember The terminal id is not owned by the service.
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 200 OK
    *     [

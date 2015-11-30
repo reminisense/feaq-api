@@ -11,14 +11,14 @@ class BroadcastController extends Controller
 {
 
   /**
-   * @api {get} broadcast/{raw_code} Fetch all the Business Broadcast Data
+   * @api {get} broadcast/{raw_code} Fetch Business Broadcast Data
    * @apiName FetchBroadcastDetails
    * @apiGroup Broadcast
    * @apiVersion 1.0.0
    * @apiExample {js} Example Usage:
    *     https://api.featherq.com/broadcast/pg21
    *     https://api.featherq.com/broadcast/reminisense-corp
-   * @apiDescription Gets all the needed data to make the broadcast page functional.
+   * @apiDescription Gets all the data needed to make the broadcast page functional.
    *
    * @apiHeader {String} access-key The unique access key sent by the client.
    * @apiPermission none
@@ -116,7 +116,7 @@ class BroadcastController extends Controller
    *       ]
    *     }
    *
-   * @apiError (200) {String} NoBusinessFound No Businesses were found using the <code>raw_code</code>.
+   * @apiError (Error) {String} NoBusinessFound No businesses were found using the <code>raw_code</code>.
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 200 OK
    *     {

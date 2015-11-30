@@ -6,16 +6,16 @@ use App\Models\AdImages;
 class AdvertisementController extends Controller {
 
   /**
-   * @api {get} advertisement/{business_id} Fetch all the Business Image Ads
+   * @api {get} advertisement/{business_id} Fetch Business Image Ads
    * @apiName FetchAdvertisementImage
-   * @apiGroup Advertisement
+   * @apiGroup Broadcast
    * @apiVersion 1.0.0
    * @apiExample {js} Example Usage:
    *     https://api.featherq.com/advertisement/1
    * @apiDescription Gets all the image advertisements that have been uploaded by the business.
    *
    * @apiHeader {String} access-key The unique access key sent by the client.
-   * @apiPermission Business Owner
+   * @apiPermission none
    *
    * @apiParam {Number} business_id The id of the business.
    *
@@ -41,7 +41,7 @@ class AdvertisementController extends Controller {
    *       }
    *     ]
    *
-   * @apiError (200) {String} NoImagesFound No Images were found using the <code>business_id</code>.
+   * @apiError (Error) {String} NoImagesFound No images were found using the <code>business_id</code>.
    * @apiErrorExample {Json} Error-Response:
    *     HTTP/1.1 200 OK
    *     {

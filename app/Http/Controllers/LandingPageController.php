@@ -26,7 +26,7 @@ class LandingPageController extends Controller
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission none
      *
-     * @apiParam {String} [keyword] The keyword used to search for the business.
+     * @apiParam {String} keyword The keyword used to search for the business.
      * @apiParam {String} [country] The country of the business.
      * @apiParam {String} [industry] The industry of the business.
      * @apiParam {String} [time_open] The time the business opens. (e.g. <code>11:00 AM</code>)
