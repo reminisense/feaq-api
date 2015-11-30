@@ -99,7 +99,7 @@ class UserController extends Controller
      *
      * @apiError (Error) {Number} success The flag indicating the success/failure of update process. Returns <code>0</code> if process was not successful.
      * @apiError (Error) {String} UserNotFound There were no users found with the given <code>user_id</code>.
-     * @apiError (Error) {String) SomethingWentWrong Something went wrong while saving your data.
+     * @apiError (Error) {String} SomethingWentWrong Something went wrong while saving your data.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
