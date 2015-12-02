@@ -11,7 +11,7 @@ class AdminController extends BaseController
 
     /**
      * @api {get} analytics/business/{date_start}/{date_end} Retrieve business analytics
-     * @apiName FetchUserProfile
+     * @apiName
      * @apiGroup User
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
@@ -51,63 +51,59 @@ class AdminController extends BaseController
     public function getBusinessnumbers($start_date, $end_date)
     {
         // TODO check permissions of API user
-        if (Admin::isAdmin()) { // PAG added permission checking
 
-            $businesses_count = 0;
-            $users_count = 0;
-            $users_information = [];
-            $businesses_information = [];
-            $temp_date = $end_date + 86400;
+        $businesses_count = 0;
+        $users_count = 0;
+        $users_information = [];
+        $businesses_information = [];
+        $temp_date = $end_date + 86400;
 
-            $businesses = Business::getBusinessByRange($start_date, $temp_date);
-            if ($businesses) {
-                $businesses_count = count($businesses);
-                for ($i = 0; $i < $businesses_count; $i++) {
-                    $user = UserBusiness::getUserByBusinessId($businesses[$i]->business_id);
-                    array_push($businesses_information,
-                        [
-                            'business_name' => $businesses[$i]->name,
-                            'name' => User::full_name($user->user_id),
-                            'email' => User::email($user->user_id),
-                            'phone' => User::phone($user->user_id)
-                        ]
-                    );
-                }
+        $businesses = Business::getBusinessByRange($start_date, $temp_date);
+        if ($businesses) {
+            $businesses_count = count($businesses);
+            for ($i = 0; $i < $businesses_count; $i++) {
+                $user = UserBusiness::getUserByBusinessId($businesses[$i]->business_id);
+                array_push($businesses_information,
+                    [
+                        'business_name' => $businesses[$i]->name,
+                        'name' => User::full_name($user->user_id),
+                        'email' => User::email($user->user_id),
+                        'phone' => User::phone($user->user_id)
+                    ]
+                );
             }
-            $users = User::getUsersByRange($start_date, $temp_date);
-            if ($users) {
-                $users_count = count($users);
-                for ($i = 0; $i < $users_count; $i++) {
-                    array_push($users_information,
-                        [
-                            'first_name' => $users[$i]->first_name,
-                            'last_name' => $users[$i]->last_name,
-                            'email' => $users[$i]->email,
-                            'phone' => $users[$i]->phone
-                        ]
-                    );
-                }
-            }
-
-            $business_numbers = [
-                'issued_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 0),
-                'called_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 1),
-                'served_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 2),
-                'dropped_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 3)
-            ];
-
-
-            return json_encode(array(
-                'success' => 1,
-                'businesses_count' => $businesses_count,
-                'businesses_information' => $businesses_information,
-                'users_count' => $users_count,
-                'users_information' => $users_information,
-                'business_numbers' => $business_numbers
-            ));
-        } else {
-            return json_encode(array('success' => 0, 'message' => 'You are not allowed to access this function.'));
         }
+        $users = User::getUsersByRange($start_date, $temp_date);
+        if ($users) {
+            $users_count = count($users);
+            for ($i = 0; $i < $users_count; $i++) {
+                array_push($users_information,
+                    [
+                        'first_name' => $users[$i]->first_name,
+                        'last_name' => $users[$i]->last_name,
+                        'email' => $users[$i]->email,
+                        'phone' => $users[$i]->phone
+                    ]
+                );
+            }
+        }
+
+        $business_numbers = [
+            'issued_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 0),
+            'called_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 1),
+            'served_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 2),
+            'dropped_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 3)
+        ];
+
+
+        return json_encode(array(
+            'success' => 1,
+            'businesses_count' => $businesses_count,
+            'businesses_information' => $businesses_information,
+            'users_count' => $users_count,
+            'users_information' => $users_information,
+            'business_numbers' => $business_numbers
+        ));
     }
 
 }
