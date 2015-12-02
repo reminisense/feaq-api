@@ -51,3 +51,6 @@ $app->post('queue/insert-number', 'QueueController@insertSpecific');
 $app->post('business/search', 'LandingPageController@search');
 
 $app->put('user/update', 'UserController@updateUser');
+
+// Analytics API
+$app->get('analytics/business/{date_start}/{date_end}', 'AdminController@getBusinessnumbers');
