@@ -15,7 +15,7 @@ class Business extends Model{
     protected $table = 'business';
     protected $primaryKey = 'business_id';
     public $timestamps = false;
-    
+
     public static function name($business_id)
     {
         return Business::where('business_id', '=', $business_id)->select(array('name'))->first()->name;
@@ -85,7 +85,7 @@ class Business extends Model{
     {
         return Business::name(Branch::businessId($branch_id));
     }
-    
+
     public static function getBusinessIdByTerminalId($terminal_id)
     {
         return Business::getBusinessIdByServiceId(Terminal::serviceId($terminal_id));
@@ -104,67 +104,9 @@ class Business extends Model{
             ->toArray();
     }
     
-    public static function getBusinessDetails($business_id)
+    public static function fetchBusinessDetails($business_id)
     {
-        $business = Business::where('business_id', '=', $business_id)->get()->first();
-        $terminals = Terminal::getTerminalsByBusinessId($business_id);
-        $terminals = Terminal::getAssignedTerminalWithUsers($terminals);
-        $analytics = Analytics::getBusinessAnalytics($business_id);
-        $first_service = Service::getFirstServiceOfBusiness($business_id);
-        $business_details = [
-            'business_id' => $business_id,
-            'business_name' => $business->name,
-            'business_address' => $business->local_address,
-            'facebook_url' => $business->fb_url,
-            'industry' => $business->industry,
-            'time_open' => Helper::mergeTime($business->open_hour, $business->open_minute, $business->open_ampm),
-            'time_closed' => Helper::mergeTime($business->close_hour, $business->close_minute, $business->close_ampm),
-            'timezone' => $business->timezone, //ARA Added timezone
-            'queue_limit' => $business->queue_limit, /* RDH Added queue_limit to Edit Business Page */
-            'terminal_specific_issue' => QueueSettings::terminalSpecificIssue($first_service->service_id),
-            'sms_current_number' => QueueSettings::smsCurrentNumber($first_service->service_id),
-            'sms_1_ahead' => QueueSettings::smsOneAhead($first_service->service_id),
-            'sms_5_ahead' => QueueSettings::smsFiveAhead($first_service->service_id),
-            'sms_10_ahead' => QueueSettings::smsTenAhead($first_service->service_id),
-            'sms_blank_ahead' => QueueSettings::smsBlankAhead($first_service->service_id),
-            'input_sms_field' => QueueSettings::inputSmsField($first_service->service_id),
-            'allow_remote' => QueueSettings::allowRemote($first_service->service_id),
-            'remote_limit' => QueueSettings::remoteLimit($first_service->service_id),
-            'terminals' => $terminals,
-            'analytics' => $analytics,
-            'features' => Business::getBusinessFeatures($business_id),
-            'sms_gateway' => QueueSettings::smsGateway($first_service->service_id),
-            'allowed_businesses' => Business::getForwardingAllowedBusinesses($business_id),
-            'raw_code' => $business->raw_code,
-        ];
-
-
-        $sms_gateway_api = unserialize(QueueSettings::smsGatewayApi($first_service->service_id));
-        if($business_details['sms_gateway'] == 'frontline_sms' && $sms_gateway_api){
-            $business_details['frontline_sms_url'] = $sms_gateway_api['frontline_sms_url'];
-            $business_details['frontline_sms_api_key'] = $sms_gateway_api['frontline_sms_api_key'];
-        }elseif($business_details['sms_gateway'] == 'twilio' && $sms_gateway_api){
-            if($sms_gateway_api['twilio_account_sid'] == TWILIO_ACCOUNT_SID &&
-                $sms_gateway_api['twilio_auth_token'] == TWILIO_AUTH_TOKEN &&
-                $sms_gateway_api['twilio_phone_number'] == TWILIO_PHONE_NUMBER){
-                $business_details['sms_gateway'] = NULL;
-                $business_details['twilio_account_sid'] = NULL;
-                $business_details['twilio_auth_token'] = NULL;
-                $business_details['twilio_phone_number'] = NULL;
-            }else{
-                $business_details['twilio_account_sid'] = $sms_gateway_api['twilio_account_sid'];
-                $business_details['twilio_auth_token'] = $sms_gateway_api['twilio_auth_token'];
-                $business_details['twilio_phone_number'] = $sms_gateway_api['twilio_phone_number'];
-            }
-        }else{
-            $business_details['sms_gateway'] = NULL;
-            $business_details['twilio_account_sid'] = NULL;
-            $business_details['twilio_auth_token'] = NULL;
-            $business_details['twilio_phone_number'] = NULL;
-        }
-
-
-        return $business_details;
+        return Business::where('business_id', '=', $business_id)->get()->first();
     }
 
     /*
@@ -329,6 +271,10 @@ public static function businessExistsByNameByAddress($business_name, $business_a
         return Business::where('name', '=', $business_name)
             ->where('local_address', '=', $business_address)
             ->get();
+    }
+
+    public static function businessExistsByBusinessId($business_id) {
+        return Business::where('business_id', '=', $business_id)->exists();
     }
 
     public static function businessExistsByRawCode($raw_code = '') {
@@ -668,7 +614,7 @@ public static function businessExistsByNameByAddress($business_name, $business_a
      * @return mixed
      */
     public static function getForwardingAllowedBusinesses($business_id){
-        return DB::table('queue_forward_permissions')
+        return \DB::table('queue_forward_permissions')
             ->where('queue_forward_permissions.business_id', '=', $business_id)
             ->join('business', 'business.business_id', '=', 'queue_forward_permissions.forwarder_id')
             ->select('business.business_id', 'business.name')

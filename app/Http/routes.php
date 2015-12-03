@@ -23,31 +23,20 @@ $app->get('advertisement/{business_id}', 'AdvertisementController@getImages');
 
 // Queue API routes
 $app->post('queue/insert-specific', 'QueueController@postInsertSpecific');
+$app->post('queue/insert-number', 'QueueController@insertSpecific');
 
 // User Profile API routes
 $app->get('user/{user_id}', 'UserController@fetchProfile');
-
+$app->post('user/register', 'AuthenticationController@register');
 $app->get('branch', 'BranchController@getTest');
+$app->put('user/update', 'UserController@updateUser');
 
 //Authentication routes
-$app->post('user/register', 'AuthenticationController@register');
-
 $app->post('login', 'AuthenticationController@login');
-
 $app->get('logout', 'AuthenticationController@logout');
 
-//Dashboard routes
+//Business API routes
 $app->get('business/search-suggest/{keyword}', 'BusinessController@searchSuggest');
-
 $app->get('business/search', 'BusinessController@search');
-
-//Broadcast routes
-
-$app->get('advertisements/{business_id}', 'AdvertisementController@advertisements');
-
-$app->post('queue/insert-number', 'QueueController@insertSpecific');
-
-// Landing Page API
+$app->get('business/{business_id}', 'BusinessController@getDetails');
 $app->post('business/search', 'LandingPageController@search');
-
-$app->put('user/update', 'UserController@updateUser');
