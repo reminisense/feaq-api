@@ -240,7 +240,7 @@ class BusinessController extends Controller
      *       }
      *     }
      *
-     * @apiError (Error) {String} NoImagesFound No images were found using the <code>business_id</code>.
+     * @apiError (Error) {String} NoBusinessFound No businesses were found using the param <code>business_id</code>.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
