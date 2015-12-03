@@ -327,7 +327,7 @@ class BusinessController extends Controller
      * @apiGroup Business
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage
-     *      http://api.featherq.com/business/delete/1
+     *      http://api.featherq.com/business/delete
      * @apiDescription Deletes the business along with its branches, services, and terminals.
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
