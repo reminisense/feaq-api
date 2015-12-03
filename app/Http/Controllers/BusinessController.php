@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Input;
 use App\Models\Business;
 use App\Models\Terminal;
 use App\Models\Service;
@@ -318,5 +319,60 @@ class BusinessController extends Controller
             $business_details['twilio_phone_number'] = NULL;
         }
         return $business_details;
+    }
+
+    /**
+     * @api {post} /business/delete Delete Business
+     * @apiName DeleteBusiness
+     * @apiGroup Business
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage
+     *      http://api.featherq.com/business/delete/1
+     * @apiDescription Deletes the business along with its branches, services, and terminals.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Admin & Business Owner
+     *
+     * @apiParam {Number} business_id The id of the business to delete.
+     *
+     * @apiSuccess (200) {Boolean} status A true boolean.
+     * @apiSuccessExample {Json} Success-Response:
+     *      HTTP/1.1 200 OK
+     *      {
+     *          "status": 1
+     *      }
+     *
+     * @apiError (Error) {String} NoBusinessFound No businesses were found using the param <code>business_id</code>.
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "err_code": "NoBusinessFound"
+     *     }
+     */
+    public function postRemove() {
+        $business_id = Input::get('business_id');
+        if (Business::businessExistsByBusinessId($business_id)) {
+            Business::deleteBusinessByBusinessId($business_id);
+            $branches = Branch::getBranchesByBusinessId($business_id);
+            foreach ($branches as $count => $data) {
+                $services = Service::getServicesByBranchId($data->branch_id);
+                foreach ($services as $count2 => $data2) {
+                    $terminals = Terminal::getTerminalsByServiceId($data2->service_id);
+                    foreach ($terminals as $count3 => $data3) {
+                        TerminalUser::deleteUserByTerminalId($data3['terminal_id']);
+                    }
+                    Terminal::deleteTerminalsByServiceId($data2->service_id);
+                }
+                Service::deleteServicesByBranchId($data->branch_id);
+            }
+            Branch::deleteBranchesByBusinessId($business_id);
+            UserBusiness::deleteUserByBusinessId($business_id);
+            return json_encode(array('status' => 1));
+        }
+        else {
+            return json_encode(array(
+              'err_code' => 'NoBusinessFound'
+            ));
+        }
     }
 }
