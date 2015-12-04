@@ -107,6 +107,7 @@ class Business extends Model{
     public static function getBusinessDetails($business_id)
     {
         $business = Business::where('business_id', '=', $business_id)->get()->first();
+        $services = Service::getBusinessServicesWithTerminals($business_id);
         $terminals = Terminal::getTerminalsByBusinessId($business_id);
         $terminals = Terminal::getAssignedTerminalWithUsers($terminals);
         $analytics = Analytics::getBusinessAnalytics($business_id);
@@ -130,6 +131,7 @@ class Business extends Model{
             'input_sms_field' => QueueSettings::inputSmsField($first_service->service_id),
             'allow_remote' => QueueSettings::allowRemote($first_service->service_id),
             'remote_limit' => QueueSettings::remoteLimit($first_service->service_id),
+            'services' => $services,
             'terminals' => $terminals,
             'analytics' => $analytics,
             'features' => Business::getBusinessFeatures($business_id),

@@ -51,3 +51,21 @@ $app->post('queue/insert-number', 'QueueController@insertSpecific');
 $app->post('business/search', 'LandingPageController@search');
 
 $app->put('user/update', 'UserController@updateUser');
+
+// RESTFUL services routes
+Route::post('services', 'ServiceController@postCreateService');
+
+Route::put('services/{id}', 'ServiceController@putUpdateService');
+
+Route::delete('services/{id}', 'ServiceController@deleteRemoveService');
+
+// RESTFUL terminals routes
+Route::post('terminals/user', 'TerminalController@postAddUser');
+
+Route::delete('terminals/user/{terminal_id}/{user_id}', 'TerminalController@deleteRemoveUser');
+
+Route::post('terminals', 'TerminalController@postCreateTerminal');
+
+Route::put('terminals/{id}', 'TerminalController@putUpdateTerminalName');
+
+Route::delete('terminals/{id}', 'TerminalController@deleteRemoveTerminal');
