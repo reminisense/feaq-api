@@ -375,4 +375,196 @@ class BusinessController extends Controller
             ));
         }
     }
+
+
+    /**
+     * @api {put} /business/update Update Business Details
+     * @apiName UpdateBusiness
+     * @apiGroup Business
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage
+     *      http://api.featherq.com/business/update
+     * @apiDescription Updates the information and details related to the business.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Admin & Business Owner
+     *
+     * @apiParam {Number} business_id The id of the business to update.
+     * @apiParam {String} business_name The name of the business.
+     * @apiParam {String} business_address The address of the business.
+     * @apiParam {String} industry The type of industry of the business.
+     * @apiParam {String} facebook_url The facebook page of the business.
+     * @apiParam {String} timezone The timezone of the business.
+     * @apiParam {String} time_open The opening time of the business.
+     * @apiParam {String} time_close The closing time of the business.
+     * @apiParam {Number} queue_limit The maximum number of priority numbers to give.
+     * @apiParam {Boolean} terminal_specific_issue A flag to identify if terminals can only call numbers they issued.
+     * @apiParam {Boolean} sms_current_number The number linked to the business for SMS capabilities.
+     * @apiParam {String} sms_1_ahead .
+     * @apiParam {String} sms_5_ahead .
+     * @apiParam {String} sms_10_ahead .
+     * @apiParam {String} sms_blank_ahead .
+     * @apiParam {String} input_sms_field .
+     * @apiParam {Boolean} allow_remote A flag to identify if the business allows remote queuing.
+     * @apiParam {Number} remote_limit The maximum number of priority numbers allowed for remote queuing.
+     * @apiParam {String} sms_gateway The sms gateway of the business.
+     * @apiParam {String} frontline_sms_url The URL of the Frontline SMS mapped to the business.
+     * @apiParam {String} frontline_sms_api_key The api key of the Frontline SMS mapped to the business.
+     * @apiParam {String} twilio_account_sid The account id of the business to Twilio.
+     * @apiParam {String} twilio_auth_token The unique token of the business to use Twilio.
+     * @apiParam {String} twilio_phone_number The phone number linked to Twilio.
+     *
+     * @apiSuccessExample {Json} Success-Response:
+     *      HTTP/1.1 200 OK
+     *      {
+     *          "status": 1
+     *      }
+     *
+     * @apiError (Error) {String} NoBusinessFound No businesses were found using the param <code>business_id</code>.
+     * @apiError (Error) {String} BusinessAlreadyExists There is already an existing business with the same <code>business_name</code> and <code>business_address</code>.
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "err_code": "NoBusinessFound"
+     *     }
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "err_code": "BusinessAlreadyExists"
+     *     }
+     */
+    public function putUpdate(){
+      $business_id = Input::get('business_id');
+      if (Business::businessExistsByBusinessId($business_id)) {
+        $business_data = array(
+          'business_name' => Input::get('business_name'),
+          'business_address' => Input::get('business_address'),
+          'industry' => Input::get('industry'),
+          'facebook_url' => Input::get('facebook_url'),
+          'timezone' => Input::get('timezone'),
+          'time_open' => Input::get('time_open'),
+          'time_close' => Input::get('time_close'),
+          'queue_limit' => Input::get('queue_limit'),
+          'terminal_specific_issue' => Input::get('terminal_specific_issue'),
+          'sms_current_number' => Input::get('sms_current_number'),
+          'sms_1_ahead' => Input::get('sms_1_ahead'),
+          'sms_5_ahead' => Input::get('sms_5_ahead'),
+          'sms_10_ahead' => Input::get('sms_10_ahead'),
+          'sms_blank_ahead' => Input::get('sms_blank_ahead'),
+          'input_sms_field' => Input::get('input_sms_field'),
+          'allow_remote' => Input::get('allow_remote'),
+          'remote_limit' => Input::get('remote_limit'),
+          'sms_gateway' => Input::get('sms_gateway'),
+          'frontline_sms_url' => Input::get('frontline_sms_url'),
+          'frontline_sms_api_key' => Input::get('frontline_sms_api_key'),
+          'twilio_account_sid' => Input::get('twilio_account_sid'),
+          'twilio_auth_token' => Input::get('twilio_auth_token'),
+          'twilio_phone_number' => Input::get('twilio_phone_number'),
+        );
+        $business = Business::find($business_id);
+        if ($this->validateBusinessNameBusinessAddress($business, $business_data)) {
+          $business->name = $business_data['business_name'];
+          $business->local_address = $business_data['business_address'];
+          $business->industry = $business_data['industry'];
+          $business->fb_url = $business_data['facebook_url'];
+          $business->timezone = $business_data['timezone']; //ARA Added timezone property
+          $time_open_arr = Helper::parseTime($business_data['time_open']);
+          $business->open_hour = $time_open_arr['hour'];
+          $business->open_minute = $time_open_arr['min'];
+          $business->open_ampm = $time_open_arr['ampm'];
+          $time_close_arr = Helper::parseTime($business_data['time_close']);
+          $business->close_hour = $time_close_arr['hour'];
+          $business->close_minute = $time_close_arr['min'];
+          $business->close_ampm = $time_close_arr['ampm'];
+          $business->queue_limit = $business_data['queue_limit']; /* RDH Added queue_limit to Edit Business Page */
+          $business->save();
+
+          //ARA For queue settings terminal-specific numbers
+          $this->getQueueSettingsUpdate($business_id, 'number_limit', $business_data['queue_limit']);
+          $this->getQueueSettingsUpdate($business_id, 'terminal_specific_issue', $business_data['terminal_specific_issue']);
+          $this->getQueueSettingsUpdate($business_id, 'sms_current_number', $business_data['sms_current_number']);
+          $this->getQueueSettingsUpdate($business_id, 'sms_1_ahead', $business_data['sms_1_ahead']);
+          $this->getQueueSettingsUpdate($business_id, 'sms_5_ahead', $business_data['sms_5_ahead']);
+          $this->getQueueSettingsUpdate($business_id, 'sms_10_ahead', $business_data['sms_10_ahead']);
+          $this->getQueueSettingsUpdate($business_id, 'sms_blank_ahead', $business_data['sms_blank_ahead']);
+          $this->getQueueSettingsUpdate($business_id, 'input_sms_field', $business_data['input_sms_field']);
+          $this->getQueueSettingsUpdate($business_id, 'allow_remote', $business_data['allow_remote']);
+          $this->getQueueSettingsUpdate($business_id, 'remote_limit', $business_data['remote_limit']);
+
+          //sms settings
+          $sms_api_data = [];
+          $sms_gateway_api = NULL;
+          if ($business_data['sms_gateway'] == 'frontline_sms') {
+            $sms_api_data = [
+              'frontline_sms_url' => $business_data['frontline_sms_url'],
+              'frontline_sms_api_key' => $business_data['frontline_sms_api_key'],
+            ];
+            $sms_gateway_api = serialize($sms_api_data);
+          }
+          elseif ($business_data['sms_gateway'] == 'twilio') {
+            if ($business_data['twilio_account_sid'] == TWILIO_ACCOUNT_SID &&
+              $business_data['twilio_auth_token'] == TWILIO_AUTH_TOKEN &&
+              $business_data['twilio_phone_number'] == TWILIO_PHONE_NUMBER
+            ) {
+              $business_data['sms_gateway'] = NULL;
+              $sms_gateway_api = NULL;
+            }
+            else {
+              $sms_api_data = [
+                'twilio_account_sid' => $business_data['twilio_account_sid'],
+                'twilio_auth_token' => $business_data['twilio_auth_token'],
+                'twilio_phone_number' => $business_data['twilio_phone_number'],
+              ];
+              $sms_gateway_api = serialize($sms_api_data);
+            }
+          }
+          $this->getQueueSettingsUpdate($business['business_id'], 'sms_gateway', $business_data['sms_gateway']);
+          $this->getQueueSettingsUpdate($business['business_id'], 'sms_gateway_api', $sms_gateway_api);
+          $business = Business::getBusinessDetails($business_id);
+          return json_encode([
+            'success' => 1,
+            'business' => $business
+          ]);
+        }
+        else {
+          return json_encode(array(
+            'err_code' => 'BusinessAlreadyExists'
+          ));
+        }
+      }
+      else {
+        return json_encode(array(
+          'err_code' => 'NoBusinessFound'
+        ));
+      }
+    }
+
+    private function validateBusinessNameBusinessAddress($dbBusiness, $business_data = array()) {
+        if ($dbBusiness->name != $business_data['business_name'] || $dbBusiness->local_address != $business_data['business_address']){
+            $row = Business::businessExistsByNameByAddress($business_data['business_name'], $business_data['business_address']);
+            if(!count($row)){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
+  private function getQueueSettingsUpdate($business_id, $field, $value){
+    $first_branch = Branch::where('business_id', '=', $business_id)->first();
+    $first_service = Service::where('branch_id', '=', $first_branch->branch_id)->first();
+    if(QueueSettings::serviceExists($first_service->service_id)){
+      QueueSettings::updateQueueSetting($first_service->service_id, $field, $value);
+    }else{
+      QueueSettings::createQueueSetting([
+        'service_id' => $first_service->service_id,
+        'date' => mktime(0, 0, 0, date('m'), date('d'), date('Y')),
+        $field => $value
+      ]);
+    }
+    return json_encode(['success' => 1]);
+  }
+
 }
