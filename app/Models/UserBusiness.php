@@ -1,12 +1,16 @@
 <?php
 
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * Created by PhpStorm.
  * User: USER
  * Date: 1/23/15
  * Time: 6:55 PM
  */
-class UserBusiness extends Eloquent
+class UserBusiness extends Model
 {
 
     protected $table = 'user_business';
@@ -52,7 +56,13 @@ class UserBusiness extends Eloquent
 
     public static function getUserByBusinessId($business_id)
     {
-        return UserBusiness::where('business_id', '=', $business_id)->get()->first();
+        $user_business =  UserBusiness::where('business_id', '=', $business_id)->get()->first();
+        if(!is_null($user_business)) {
+            $user_id = $user_business->user_id;
+            return User::getUserByUserId($user_id);
+        } else {
+            return null;
+        }
     }
 
 }

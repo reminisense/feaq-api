@@ -627,6 +627,10 @@ public static function businessExistsByNameByAddress($business_name, $business_a
         return Business::where('name', $business_name)->get();
     }
 
+    public static function getBusinessByRangeYmd($start_date, $end_date){
+        return Business::where('registration_date', '>=', $start_date)->where('registration_date','<', $end_date)->get();
+    }
+
     public static function getBusinessByRange($start_date, $end_date){
         $temp_start_date = date("Y/m/d", $start_date);
         $temp_end_date = date("Y/m/d", $end_date);
