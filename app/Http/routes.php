@@ -53,4 +53,15 @@ $app->post('business/search', 'LandingPageController@search');
 $app->put('user/update', 'UserController@updateUser');
 
 // Analytics API
-$app->get('analytics/business/{date_start}/{date_end}', 'AdminController@getBusinessnumbers');
+$app->get('analytics/business/{business_id}/{date_start}/{date_end}', 'AdminController@getBusinessnumbers');
+
+// Admin API
+$app->get('admin/analytics/{date_start}/{date_end}', 'AdminController@getBusinessnumbers');
+$app->get('admin/list', 'AdminController@getAdmins');
+$app->post('admin/add/{email}', 'AdminController@addAdmin');
+$app->delete('admin/delete/{email}', 'AdminController@removeAdmin');
+$app->get('admin/watchdog/{keyword}', 'AdminController@keyword');
+$app->get('admin/features/{business_id}', 'AdminController@features');
+$app->post('admin/features/update', 'AdminController@featuresUpdate');
+$app->get('admin/stats/{date_start}/{date_end}', 'AdminController@stats');
+$app->post('admin/show-graph', 'AdminController@showGraph');
