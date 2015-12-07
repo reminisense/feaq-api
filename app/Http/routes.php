@@ -53,19 +53,19 @@ $app->post('business/search', 'LandingPageController@search');
 $app->put('user/update', 'UserController@updateUser');
 
 // RESTFUL services routes
-Route::post('services', 'ServiceController@postCreateService');
+$app->post('services', 'ServiceController@postCreateService');
 
-Route::put('services/{id}', 'ServiceController@putUpdateService');
+$app->put('services/{id}', 'ServiceController@putUpdateService');
 
-Route::delete('services/{id}', 'ServiceController@deleteRemoveService');
+$app->delete('services/{id}', 'ServiceController@deleteRemoveService');
 
 // RESTFUL terminals routes
-Route::post('terminals/user', 'TerminalController@postAddUser');
+$app->post('terminals/user', 'TerminalController@postAddUser');
 
-Route::delete('terminals/user/{terminal_id}/{user_id}', 'TerminalController@deleteRemoveUser');
+$app->delete('terminals/user/{terminal_id}/{user_id}', 'TerminalController@deleteRemoveUser');
 
-Route::post('terminals', 'TerminalController@postCreateTerminal');
+$app->post('terminals', 'TerminalController@postCreateTerminal');
 
-Route::put('terminals/{id}', 'TerminalController@putUpdateTerminalName');
+$app->put('terminals/{id}', 'TerminalController@putUpdateTerminalName');
 
-Route::delete('terminals/{id}', 'TerminalController@deleteRemoveTerminal');
+$app->delete('terminals/{id}', 'TerminalController@deleteRemoveTerminal');

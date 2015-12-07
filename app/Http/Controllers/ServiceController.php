@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Business;
 use App\Models\Service;
+use Illuminate\Support\Facades\Input;
 
 class ServiceController extends Controller{
     /**
@@ -85,7 +86,7 @@ class ServiceController extends Controller{
      *
      */
     public function putUpdateService($service_id){
-        if(Business::where('service_id', '=', $service_id)->exists()){
+        if(Service::where('service_id', '=', $service_id)->exists()){
             Service::updateServiceName($service_id, Input::get('name'));
             return json_encode(['success' => 1]);
         }else{
@@ -123,7 +124,7 @@ class ServiceController extends Controller{
      *
      */
     public function deleteRemoveService($service_id){
-        if(Business::where('service_id', '=', $service_id)->exists()){
+        if(Service::where('service_id', '=', $service_id)->exists()){
             Service::deleteService($service_id);
             return json_encode(['success' => 1]);
         }else{

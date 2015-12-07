@@ -8,9 +8,11 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Input;
+use App\Models\User;
 use App\Models\Business;
 use App\Models\Terminal;
 use App\Models\TerminalTransaction;
+use App\Models\TerminalUser;
 
 class TerminalController extends Controller{
 
@@ -191,7 +193,7 @@ class TerminalController extends Controller{
         $user_id = Input::get('user_id');
         if(!Terminal::where('terminal_id', '=', $terminal_id)->exists()) {
             return json_encode(['success' => 0, 'error_message' => 'Terminal does not exist.']);
-        }elseif(!Terminal::where('user_id', '=', $user_id)->exists()){
+        }elseif(!User::where('user_id', '=', $user_id)->exists()){
             $business_id = Business::getBusinessIdByTerminalId($terminal_id);
             $business = Business::getBusinessDetails($business_id);
             $business['error'] = 'User does not exist.';
@@ -238,7 +240,7 @@ class TerminalController extends Controller{
     public function deleteRemoveUser($terminal_id, $user_id){
         if(!Terminal::where('terminal_id', '=', $terminal_id)->exists()) {
             return json_encode(['success' => 1, 'error_message' => 'Terminal does not exist.']);
-        }elseif(!Terminal::where('user_id', '=', $user_id)->exists()){
+        }elseif(!User::where('user_id', '=', $user_id)->exists()){
             $business_id = Business::getBusinessIdByTerminalId($terminal_id);
             $business = Business::getBusinessDetails($business_id);
             $business['error'] = 'User does not exist.';

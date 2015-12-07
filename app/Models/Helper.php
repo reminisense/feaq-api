@@ -97,4 +97,9 @@ class Helper extends Model{
         }
         return $query->get();
     }
+
+    public static function mergeTime($hour, $min, $ampm)
+    {
+        return Helper::doubleZero($hour) . ':' . Helper::doubleZero($min) . ' ' . $ampm;
+    }
 }
