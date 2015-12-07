@@ -7,6 +7,7 @@ use App\Models\UserBusiness;
 use App\Models\User;
 use App\Models\Analytics;
 use App\Models\Admin;
+use Illuminate\Support\Facades\Input;
 
 /**
  * Created by PhpStorm.
@@ -18,7 +19,7 @@ class AdminController extends Controller
 {
 
     /**
-     * @api {get} /admin/analytics/{date_start}/{date_end} Retrieve business analytics.
+     * @api {get} /admin/stats/{date_start}/{date_end} Retrieve business analytics.
      * @apiName Admin Analytics
      * @apiGroup Admin
      * @apiVersion 1.0.0
@@ -344,6 +345,120 @@ class AdminController extends Controller
                 return json_encode(array(
                     'success' => 0,
                     'err_code' => 'Failed to add to admin list'
+                ));
+            }
+        } else {
+            return json_encode(array(
+                'success' => 0,
+                'err_code' => 'Unauthorized'
+            ));
+        }
+    }
+
+    /**
+     * @api {post} /admin/features/update Update business features.
+     * @apiName Business features update
+     * @apiGroup Admin
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/admin/features/update
+     * @apiDescription Update business features information.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Authenticated Admin
+     *
+     *
+     * @apiSuccess (200) {Boolean} success Process success flag.
+     *
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *      {
+     *          "success": 1
+     *      }
+     *
+     * @apiError (Error) {Boolean} success Process fail flag.
+     * @apiError (Error) {String} err_code Unauthorized User does not have admin rights.
+     *
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "success": 0,
+     *       "err_code": "Unauthorized"
+     *     }
+     */
+    public function postSaveFeatures($business_id = null)
+    {
+        // TODO check permissions of API user, add authentication here.
+        if (true) {
+            $business = Business::getBusinessByBusinessId($business_id);
+            if (!is_null($business)) {
+                $data = Input::all();
+                Business::saveBusinessFeatures($business_id, $data);
+                return json_encode(array(
+                    'success' => 1
+                ));
+            } else {
+                return json_encode(array(
+                    'success' => 0,
+                    'err_code' => 'Business does not exist'
+                ));
+            }
+        } else {
+            return json_encode(array(
+                'success' => 0,
+                'err_code' => 'Unauthorized'
+            ));
+        }
+    }
+
+    /**
+     * @api {get} /admin/features/{business_id} Retrieve business features.
+     * @apiName Retrieve business features
+     * @apiGroup Admin
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/admin/features/123
+     * @apiDescription Retrieve business features information.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Authenticated Admin
+     *
+     *
+     * @apiSuccess (200) {Boolean} success Process success flag.
+     * @apiSuccess (200) {Object} features Business features.
+     *
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *      {
+     *          "success": 1,
+     *          "features": {
+     *              "terminal_users": "3",
+     *              "allow_sms": "true"
+     *          }
+     *      }
+     *
+     * @apiError (Error) {Boolean} success Process fail flag.
+     * @apiError (Error) {String} err_code Unauthorized User does not have admin rights.
+     * @apiError (Error) {String} err_code Not Found Business does not exist.
+     *
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "success": 0,
+     *       "err_code": "Unauthorized"
+     *     }
+     */
+    public function getBusinessFeatures($business_id = null)
+    {
+        // TODO check permissions of API user, add authentication here.
+        if (true) {
+            $business = Business::getBusinessByBusinessId($business_id);
+            if (!is_null($business)) {
+                return json_encode(['success' => 1, 'features' => $business->business_features]);
+            } else {
+                return json_encode(array(
+                    'success' => 0,
+                    'err_code' => 'Business does not exist'
                 ));
             }
         } else {
