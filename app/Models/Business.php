@@ -10,12 +10,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Business extends Model{
+class Business extends Model
+{
 
     protected $table = 'business';
     protected $primaryKey = 'business_id';
     public $timestamps = false;
-    
+
     public static function name($business_id)
     {
         return Business::where('business_id', '=', $business_id)->select(array('name'))->first()->name;
@@ -61,7 +62,8 @@ class Business extends Model{
         return Business::where('business_id', '=', $business_id)->select(array('industry'))->first()->industry;
     }
 
-    public static function getBusinessIdByRawCode($raw_code = '') {
+    public static function getBusinessIdByRawCode($raw_code = '')
+    {
         return Business::where('raw_code', '=', $raw_code)->select(array('business_id'))->first()->business_id;
     }
 
@@ -85,7 +87,7 @@ class Business extends Model{
     {
         return Business::name(Branch::businessId($branch_id));
     }
-    
+
     public static function getBusinessIdByTerminalId($terminal_id)
     {
         return Business::getBusinessIdByServiceId(Terminal::serviceId($terminal_id));
@@ -96,14 +98,15 @@ class Business extends Model{
         return Branch::businessId(Service::branchId($service_id));
     }
 
-    public static function searchSuggest($keyword){
+    public static function searchSuggest($keyword)
+    {
         return Business::where('name', 'LIKE', '%' . $keyword . '%')
             ->orWhere('local_address', 'LIKE', '%' . $keyword . '%')
             ->select(array('name', 'local_address'))
             ->get()
             ->toArray();
     }
-    
+
     public static function getBusinessDetails($business_id)
     {
         $business = Business::where('business_id', '=', $business_id)->get()->first();
@@ -140,23 +143,24 @@ class Business extends Model{
 
 
         $sms_gateway_api = unserialize(QueueSettings::smsGatewayApi($first_service->service_id));
-        if($business_details['sms_gateway'] == 'frontline_sms' && $sms_gateway_api){
+        if ($business_details['sms_gateway'] == 'frontline_sms' && $sms_gateway_api) {
             $business_details['frontline_sms_url'] = $sms_gateway_api['frontline_sms_url'];
             $business_details['frontline_sms_api_key'] = $sms_gateway_api['frontline_sms_api_key'];
-        }elseif($business_details['sms_gateway'] == 'twilio' && $sms_gateway_api){
-            if($sms_gateway_api['twilio_account_sid'] == TWILIO_ACCOUNT_SID &&
+        } elseif ($business_details['sms_gateway'] == 'twilio' && $sms_gateway_api) {
+            if ($sms_gateway_api['twilio_account_sid'] == TWILIO_ACCOUNT_SID &&
                 $sms_gateway_api['twilio_auth_token'] == TWILIO_AUTH_TOKEN &&
-                $sms_gateway_api['twilio_phone_number'] == TWILIO_PHONE_NUMBER){
+                $sms_gateway_api['twilio_phone_number'] == TWILIO_PHONE_NUMBER
+            ) {
                 $business_details['sms_gateway'] = NULL;
                 $business_details['twilio_account_sid'] = NULL;
                 $business_details['twilio_auth_token'] = NULL;
                 $business_details['twilio_phone_number'] = NULL;
-            }else{
+            } else {
                 $business_details['twilio_account_sid'] = $sms_gateway_api['twilio_account_sid'];
                 $business_details['twilio_auth_token'] = $sms_gateway_api['twilio_auth_token'];
                 $business_details['twilio_phone_number'] = $sms_gateway_api['twilio_phone_number'];
             }
-        }else{
+        } else {
             $business_details['sms_gateway'] = NULL;
             $business_details['twilio_account_sid'] = NULL;
             $business_details['twilio_auth_token'] = NULL;
@@ -230,9 +234,9 @@ class Business extends Model{
         }
 
         //check if timezone is numeric
-        if(is_numeric($timezone)){
+        if (is_numeric($timezone)) {
             $timezones = Helper::timezoneOffsetToNameArray($timezone);
-        }else{
+        } else {
             $timezones = [$timezone];
         }
 
@@ -241,7 +245,7 @@ class Business extends Model{
         $query = Business::where('name', 'LIKE', '%' . $name . '%');
 
         //query for country/location
-        if($country){
+        if ($country) {
             $query->where('latitude', '<=', $country['ne_lat'])
                 ->where('latitude', '>=', $country['sw_lat'])
                 ->where('longitude', '<=', $country['ne_lng'])
@@ -249,23 +253,23 @@ class Business extends Model{
         }
 
         //query for industry
-        if($industry != ''){
+        if ($industry != '') {
             $query->where('industry', 'LIKE', '%' . $industry . '%');
         }
 
         //query timezone if name is not given
-        if($timezone){
+        if ($timezone) {
             $query->whereIn('timezone', $timezones);
         }
 
         //query for time open
-        if($time_open){
-            if($time_open_arr['hour'] < 12){
+        if ($time_open) {
+            if ($time_open_arr['hour'] < 12) {
                 $query->where('open_ampm', '=', $time_open_arr['ampm'])
                     ->where('open_hour', '!=', '12')
                     ->where('open_hour', '>=', $time_open_arr['hour'])
                     ->where('open_minute', '>=', $time_open_arr['min']);
-            }elseif($time_open_arr['hour'] == 12){
+            } elseif ($time_open_arr['hour'] == 12) {
                 $query->where('open_ampm', '=', $time_open_arr['ampm'])
                     ->where('open_hour', '<=', '12');
             }
@@ -274,27 +278,28 @@ class Business extends Model{
         return $query->get();
     }
 
-    public static function searchBusiness($get){
+    public static function searchBusiness($get)
+    {
         $values = [
-            'keyword'   => isset($get['keyword']) ? $get['keyword'] : '',
-            'industry'  => isset($get['industry']) ? $get['industry'] : '',
-            'country'   => isset($get['country']) && $get['country'] != '' ? $get['country'] : null,
+            'keyword' => isset($get['keyword']) ? $get['keyword'] : '',
+            'industry' => isset($get['industry']) ? $get['industry'] : '',
+            'country' => isset($get['country']) && $get['country'] != '' ? $get['country'] : null,
             'time_open' => isset($get['time_open']) && $get['time_open'] != '' ? $get['time_open'] : null,
-            'timezone'  => isset($get['timezone']) && $get['timezone'] != '' ? $get['timezone'] : null,
-            'limit'     => isset($get['limit']) && $get['limit'] != '' ? (int) $get['limit'] : 8,
-            'offset'    => isset($get['offset']) && $get['offset'] != '' ? (int) $get['offset'] : 0,
+            'timezone' => isset($get['timezone']) && $get['timezone'] != '' ? $get['timezone'] : null,
+            'limit' => isset($get['limit']) && $get['limit'] != '' ? (int)$get['limit'] : 8,
+            'offset' => isset($get['offset']) && $get['offset'] != '' ? (int)$get['offset'] : 0,
         ];
 
         $values = json_decode(json_encode($values), FALSE);
-        if($values->country != ''){
-            $geolocation = json_decode(file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.$values->country));
+        if ($values->country != '') {
+            $geolocation = json_decode(file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address=' . $values->country));
             $values->location = array(
                 'ne_lat' => $geolocation->results[0]->geometry->bounds->northeast->lat,
                 'ne_lng' => $geolocation->results[0]->geometry->bounds->northeast->lng,
                 'sw_lat' => $geolocation->results[0]->geometry->bounds->southwest->lat,
                 'sw_lng' => $geolocation->results[0]->geometry->bounds->southwest->lng,
             );
-        }else{
+        } else {
             $values->location = [];
         }
 
@@ -324,14 +329,16 @@ class Business extends Model{
 
         return array_slice($arr, $values->offset, $values->limit);
     }
-public static function businessExistsByNameByAddress($business_name, $business_address)
+
+    public static function businessExistsByNameByAddress($business_name, $business_address)
     {
         return Business::where('name', '=', $business_name)
             ->where('local_address', '=', $business_address)
             ->get();
     }
 
-    public static function businessExistsByRawCode($raw_code = '') {
+    public static function businessExistsByRawCode($raw_code = '')
+    {
         return Business::where('raw_code', '=', $raw_code)->exists();
     }
 
@@ -623,46 +630,56 @@ public static function businessExistsByNameByAddress($business_name, $business_a
         return $is_calling || $is_issuing;
     }
 
-    public static function getBusinessIdByName($business_name){
+    public static function getBusinessIdByName($business_name)
+    {
         return Business::where('name', $business_name)->get();
     }
 
-    public static function getBusinessByRangeYmd($start_date, $end_date){
-        return Business::where('registration_date', '>=', $start_date)->where('registration_date','<', $end_date)->get();
+    public static function getBusinessByRangeYmd($start_date, $end_date)
+    {
+        return Business::where('registration_date', '>=', $start_date)->where('registration_date', '<', $end_date)->get();
     }
 
-    public static function getBusinessByRange($start_date, $end_date){
+    public static function getBusinessByRange($start_date, $end_date)
+    {
         $temp_start_date = date("Y/m/d", $start_date);
         $temp_end_date = date("Y/m/d", $end_date);
-        return Business::where('registration_date', '>=', $temp_start_date)->where('registration_date','<', $temp_end_date)->get();
+        return Business::where('registration_date', '>=', $temp_start_date)->where('registration_date', '<', $temp_end_date)->get();
     }
 
-    public static function getAllBusinessNames(){
+    public static function getAllBusinessNames()
+    {
         return Business::select('business_id', 'name')->get();
     }
 
-    public static function getBusinessIdsByIndustry($industry){
-        return Business::select('business_id')->where('industry',"=", $industry)->get();
+    public static function getBusinessIdsByIndustry($industry)
+    {
+        return Business::select('business_id')->where('industry', "=", $industry)->get();
     }
 
-    public static function getBusinessIdsByCountry($country){
+    public static function getBusinessIdsByCountry($country)
+    {
         return Business::select('business_id')->where('local_address', 'LIKE', '%' . $country . '%')->get();
     }
 
-    public static function getAvailableIndustries(){
+    public static function getAvailableIndustries()
+    {
         return Business::select('industry')->groupBy('industry')->get();
     }
 
-    public static function saveBusinessFeatures($business_id, $features = array()){
+    public static function saveBusinessFeatures($business_id, $features = array())
+    {
         Business::where('business_id', '=', $business_id)->update(['business_features' => serialize($features)]);
     }
 
-    public static function getBusinessFeatures($business_id){
+    public static function getBusinessFeatures($business_id)
+    {
         $serialized = Business::where('business_id', '=', $business_id)->select('business_features')->first()->business_features;
         return unserialize($serialized);
     }
 
-    public static function getBusinessAccessKey($business_id){
+    public static function getBusinessAccessKey($business_id)
+    {
         return Crypt::encrypt($business_id);
     }
 
@@ -671,7 +688,8 @@ public static function businessExistsByNameByAddress($business_name, $business_a
      * @param $business_id
      * @return mixed
      */
-    public static function getForwardingAllowedBusinesses($business_id){
+    public static function getForwardingAllowedBusinesses($business_id)
+    {
         return DB::table('queue_forward_permissions')
             ->where('queue_forward_permissions.business_id', '=', $business_id)
             ->join('business', 'business.business_id', '=', 'queue_forward_permissions.forwarder_id')
@@ -679,7 +697,8 @@ public static function businessExistsByNameByAddress($business_name, $business_a
             ->get();
     }
 
-    public static function getForwarderAllowedBusinesses($business_id){
+    public static function getForwarderAllowedBusinesses($business_id)
+    {
         return DB::table('queue_forward_permissions')
             ->where('queue_forward_permissions.forwarder_id', '=', $business_id)
             ->join('business', 'business.business_id', '=', 'queue_forward_permissions.business_id')
@@ -687,68 +706,76 @@ public static function businessExistsByNameByAddress($business_name, $business_a
             ->get();
     }
 
-    public static function getForwarderAllowedInBusiness($business_id, $forwarder_id){
+    public static function getForwarderAllowedInBusiness($business_id, $forwarder_id)
+    {
         return DB::table('queue_forward_permissions')->where('business_id', '=', $business_id)->where('forwarder_id', '=', $forwarder_id)->first();
     }
 
-    public static function getKeywordsByBusinessId($business_id){
-        try{
+    public static function getKeywordsByBusinessId($business_id)
+    {
+        try {
             $industry = Business::industry($business_id);
-        }catch(Exception $e){
+        } catch (Exception $e) {
             $industry = '';
         }
         return Business::getIndustryKeywords($industry);
     }
 
-    public static function getIndustryKeywords($industry){
+    public static function getIndustryKeywords($industry)
+    {
         return isset(Business::$keywords[$industry]) ? Business::$keywords[$industry] : [];
     }
 
+    public static function getBusinessByBusinessId($business_id)
+    {
+        return Business::where('business_id', '=', $business_id)->get()->first();
+    }
+
     private static $keywords = [
-        'Accounting'                => ['accounting'],
-        'Advertising'               => ['advertising'],
-        'Agriculture'               => ['agriculture'],
-        'Air Services'              => ['air services'],
-        'Airlines'                  => ['airlines'],
-        'Apparel'                   => ['apparel'],
-        'Appliances'                => ['appliances'],
-        'Auto Dealership'           => ['auto dealership'],
-        'Banking'                   => ['banking'],
-        'Broadcasting'              => ['broadcasting'],
-        'Business Services'         => ['business services'],
-        'Communications'            => ['communications'],
-        'Corporate'                 => ['corporate'],
-        'Customer Service'          => ['customer service'],
-        'Delivery'                  => ['delivery'],
-        'Delivery Services'         => ['delivery services'],
-        'Education'                 => ['education'],
-        'Energy'                    => ['energy', 'electricity', 'power'],
-        'Entertainment'             => ['entertainment'],
-        'Events'                    => ['events'],
-        'Food and Beverage'         => ['food', 'beverage'],
-        'Government'                => ['government'],
-        'Grocery'                   => ['grocery'],
-        'Healthcare'                => ['healthcare'],
-        'Hobbies and Collections'   => ['hobbies', 'collections'],
-        'Hospitality'               => ['hospitality'],
-        'Insurance'                 => ['insurance'],
-        'Information Technology'    => ['information technology'],
-        'Lifestyle'                 => ['lifestyle'],
-        'Mail Order Services'       => ['mail order service', 'mail order'],
-        'Manufacturing'             => ['manufacturing'],
-        'Media'                     => ['media'],
-        'Pharmaceutical'            => ['pharmaceutical', 'pharmacy'],
-        'Professional services'     => ['professional services'],
-        'Publishing'                => ['publishing'],
-        'Real Estate'               => ['real estate'],
-        'Recreation'                => ['recreation'],
-        'Rentals'                   => ['rentals'],
-        'Retail'                    => ['retail'],
-        'Software Development'      => ['software development', 'software'],
-        'Technology'                => ['technology'],
-        'Travel and Tours'          => ['travel and tours', 'travel', 'tours'],
-        'Utility services'          => ['utility services'],
-        'Web Services'              => ['web services'],
-        'Wholesale'                 => ['wholesale'],
+        'Accounting' => ['accounting'],
+        'Advertising' => ['advertising'],
+        'Agriculture' => ['agriculture'],
+        'Air Services' => ['air services'],
+        'Airlines' => ['airlines'],
+        'Apparel' => ['apparel'],
+        'Appliances' => ['appliances'],
+        'Auto Dealership' => ['auto dealership'],
+        'Banking' => ['banking'],
+        'Broadcasting' => ['broadcasting'],
+        'Business Services' => ['business services'],
+        'Communications' => ['communications'],
+        'Corporate' => ['corporate'],
+        'Customer Service' => ['customer service'],
+        'Delivery' => ['delivery'],
+        'Delivery Services' => ['delivery services'],
+        'Education' => ['education'],
+        'Energy' => ['energy', 'electricity', 'power'],
+        'Entertainment' => ['entertainment'],
+        'Events' => ['events'],
+        'Food and Beverage' => ['food', 'beverage'],
+        'Government' => ['government'],
+        'Grocery' => ['grocery'],
+        'Healthcare' => ['healthcare'],
+        'Hobbies and Collections' => ['hobbies', 'collections'],
+        'Hospitality' => ['hospitality'],
+        'Insurance' => ['insurance'],
+        'Information Technology' => ['information technology'],
+        'Lifestyle' => ['lifestyle'],
+        'Mail Order Services' => ['mail order service', 'mail order'],
+        'Manufacturing' => ['manufacturing'],
+        'Media' => ['media'],
+        'Pharmaceutical' => ['pharmaceutical', 'pharmacy'],
+        'Professional services' => ['professional services'],
+        'Publishing' => ['publishing'],
+        'Real Estate' => ['real estate'],
+        'Recreation' => ['recreation'],
+        'Rentals' => ['rentals'],
+        'Retail' => ['retail'],
+        'Software Development' => ['software development', 'software'],
+        'Technology' => ['technology'],
+        'Travel and Tours' => ['travel and tours', 'travel', 'tours'],
+        'Utility services' => ['utility services'],
+        'Web Services' => ['web services'],
+        'Wholesale' => ['wholesale'],
     ];
 }
