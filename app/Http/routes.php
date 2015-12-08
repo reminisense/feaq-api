@@ -69,3 +69,12 @@ $app->post('terminals', 'TerminalController@postCreateTerminal');
 $app->put('terminals/{id}', 'TerminalController@putUpdateTerminalName');
 
 $app->delete('terminals/{id}', 'TerminalController@deleteRemoveTerminal');
+
+//RESTFUL queue routes
+$app->get('queue/numbers/{id}', 'QueueController@getAllNumbers');
+
+$app->put('queue/serve', 'QueueController@putServeNumber');
+
+$app->put('queue/drop', 'QueueController@putDropNumber');
+
+$app->put('queue/call', 'QueueController@putCallNumber');

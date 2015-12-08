@@ -9,6 +9,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class TerminalUser extends Model{
 
@@ -54,5 +55,15 @@ class TerminalUser extends Model{
 
     public static function updateTerminalUserStatus($user_id, $terminal_id, $status = 0){
         TerminalUser::where('user_id', '=', $user_id)->where('terminal_id', '=', $terminal_id)->update(['status' => $status]);
+    }
+
+    public static function hookedTerminal($terminal_id) {
+        if (DB::table('terminal_manager')->where('terminal_id', '=', $terminal_id)->first()) {
+            return DB::table('terminal_manager')->orderBy('login_id', 'desc')->select('in_out')->where('terminal_id', '=', $terminal_id)->first()->in_out;
+        }
+    }
+
+    public static function getLatestLoginIdOfTerminal($terminal_id) {
+        return DB::table('terminal_manager')->orderBy('login_id', 'desc')->select('login_id')->where('terminal_id', '=', $terminal_id)->first()->login_id;
     }
 }
