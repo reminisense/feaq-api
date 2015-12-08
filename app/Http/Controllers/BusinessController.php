@@ -14,6 +14,7 @@ use App\Models\Terminal;
 use App\Models\Service;
 use App\Models\Analytics;
 use App\Models\QueueSettings;
+use App\Models\Helper;
 use App\Models\Branch;
 use App\Models\TerminalUser;
 use App\Models\UserBusiness;
@@ -523,7 +524,7 @@ class BusinessController extends Controller
           }
           $this->getQueueSettingsUpdate($business['business_id'], 'sms_gateway', $business_data['sms_gateway']);
           $this->getQueueSettingsUpdate($business['business_id'], 'sms_gateway_api', $sms_gateway_api);
-          $business = Business::getBusinessDetails($business_id);
+          $business = Business::fetchBusinessDetails($business_id);
           return json_encode([
             'success' => 1,
             'business' => $business
