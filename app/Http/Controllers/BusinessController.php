@@ -14,6 +14,9 @@ use App\Models\Terminal;
 use App\Models\Service;
 use App\Models\Analytics;
 use App\Models\QueueSettings;
+use App\Models\Branch;
+use App\Models\TerminalUser;
+use App\Models\UserBusiness;
 
 class BusinessController extends Controller
 {

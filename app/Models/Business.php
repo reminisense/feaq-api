@@ -284,9 +284,6 @@ public static function businessExistsByNameByAddress($business_name, $business_a
     public static function deleteBusinessByBusinessId($business_id)
     {
         Business::where('business_id', '=', $business_id)->delete();
-
-        // PAG delete also the json file
-        unlink(public_path() . '/json/' . $business_id . '.json');
     }
 
     /*
