@@ -352,7 +352,7 @@ class BusinessController extends Controller
      *       "err_code": "NoBusinessFound"
      *     }
      */
-    public function postRemove() {
+    public function deleteRecord() {
         $business_id = Input::get('business_id');
         if (Business::businessExistsByBusinessId($business_id)) {
             Business::deleteBusinessByBusinessId($business_id);

@@ -40,5 +40,5 @@ $app->get('business/search-suggest/{keyword}', 'BusinessController@searchSuggest
 $app->get('business/search', 'BusinessController@search');
 $app->get('business/{business_id}', 'BusinessController@getDetails');
 $app->post('business/search', 'LandingPageController@search');
-$app->post('business/delete', 'BusinessController@postRemove');
+$app->delete('business/delete', 'BusinessController@deleteRecord');
 $app->put('business/update', 'BusinessController@putUpdate');
