@@ -114,9 +114,9 @@ class AdminController extends Controller
             $users_count = 0;
             $users_information = [];
             $businesses_information = [];
-            $end_date = date('Ymd', strtotime($end_date . "+1 days"));
+            $end_date_1 = date('Ymd', strtotime($end_date . "+1 days"));
 
-            $businesses = Business::getBusinessByRangeYmd($start_date, $end_date);
+            $businesses = Business::getBusinessByRangeYmd($start_date, $end_date_1);
             if ($businesses) {
                 $businesses_count = count($businesses);
                 for ($i = 0; $i < $businesses_count; $i++) {
