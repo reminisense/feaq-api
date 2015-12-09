@@ -39,4 +39,12 @@ class User extends Model
     {
         return User::where('fb_id', '=', $fb_id)->select(array('user_id'))->first()->user_id;
     }
+
+    public static function searchByEmail($email){
+        $user =  User::where('verified', '=', 1)
+            ->where('email', '=', $email )
+            ->select('user_id', 'first_name', 'last_name', 'email')
+            ->first();
+        return $user ? $user->toArray() : null;
+    }
 }

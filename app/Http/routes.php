@@ -78,3 +78,7 @@ $app->put('queue/serve', 'QueueController@putServeNumber');
 $app->put('queue/drop', 'QueueController@putDropNumber');
 
 $app->put('queue/call', 'QueueController@putCallNumber');
+
+$app->post('queue/insert-multiple', 'QueueController@postIssueMultiple');
+
+$app->post('queue/user/rate', 'QueueController@postUserRating');

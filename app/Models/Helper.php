@@ -102,4 +102,9 @@ class Helper extends Model{
     {
         return Helper::doubleZero($hour) . ':' . Helper::doubleZero($min) . ' ' . $ampm;
     }
+
+    public static function userId(){
+        //@todo add function to get the user id based on the oauth function to be implemented
+        return 0;
+    }
 }

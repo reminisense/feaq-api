@@ -132,8 +132,32 @@ class QueueController extends Controller {
     }
 
 
-    public function postIssueMultiple(){}
-    public function putRating(){}
+    /**
+     * ok
+     */
+    public function postIssueMultiple(){
+        $data = new \stdClass();
+        $data->service_id = Input::get('service_id');
+        $data->terminal_id = Input::get('terminal_id');
+        $data->number_start = Input::get('number_start');
+        $data->range = Input::get('range');
+        $data->date = Input::has('date')? Input::get('date') : null;
+
+       return Queue::issueMultipleNumbers($data);
+    }
+
+    /**
+     * ok
+     */
+    public function postUserRating(){
+        $data = new \stdClass();
+        $data->rating = Input::get('rating');
+        $data->email = Input::get('email');
+        $data->terminal_id = Input::get('terminal_id');
+        $data->action = Input::get('action');
+
+        return Queue::rateUser($data);
+    }
 
 
 }

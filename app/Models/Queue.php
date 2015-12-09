@@ -203,7 +203,7 @@ class Queue extends Model
         $confirmation_code = Queue::confirmationCode($track_id);
         $transaction_number = PriorityQueue::createPriorityQueue($track_id, $priority_number, $confirmation_code, $user_id, $queue_platform);
         TerminalTransaction::createTerminalTransaction($transaction_number, $time_queued, $terminal_id);
-        //Analytics::insertAnalyticsQueueNumberIssued($transaction_number, $service_id, $date, $time_queued, $terminal_id, $queue_platform); //insert to queue_analytics
+        Analytics::insertAnalyticsQueueNumberIssued($transaction_number, $service_id, $date, $time_queued, $terminal_id, $queue_platform); //insert to queue_analytics
         $number = array(
             'transaction_number' => $transaction_number,
             'priority_number' => $priority_number,
@@ -289,9 +289,9 @@ class Queue extends Model
             $time_called = time();
             $login_id = TerminalUser::hookedTerminal($terminal_id) ? TerminalUser::getLatestLoginIdOfTerminal($terminal_id) : 0;
             TerminalTransaction::updateTransactionTimeCalled($transaction_number, $login_id, $time_called, $terminal_id);
-            //Analytics::insertAnalyticsQueueNumberCalled($transaction_number, $pn->service_id, $pn->date, $time_called, $terminal_id, $pq->queue_platform); //insert to queue_analytics
+            Analytics::insertAnalyticsQueueNumberCalled($transaction_number, $pn->service_id, $pn->date, $time_called, $terminal_id, $pq->queue_platform); //insert to queue_analytics
             //Notifier::sendNumberCalledNotification($transaction_number, $terminal_id); //notifies users that his/her number is called
-            return json_encode(['success' => 1, 'numbers' => Queue::terminalNumbers($terminal_id)]);
+            return json_encode(['success' => 1, /*'numbers' => Queue::terminalNumbers($terminal_id)*/]); //ARA removed all numbers to prevent redundant database query
         }else{
             return json_encode(['error' => 'Please assign a terminal.']);
         }
@@ -321,10 +321,10 @@ class Queue extends Model
             $time = time();
             if($process == 'serve'){
                 TerminalTransaction::updateTransactionTimeCompleted($transaction_number, $time);
-                //Analytics::insertAnalyticsQueueNumberServed($transaction_number, $priority_number->service_id, $priority_number->date, $time, $terminal_id, $priority_queue->queue_platform); //insert to queue_analytics
+                Analytics::insertAnalyticsQueueNumberServed($transaction_number, $priority_number->service_id, $priority_number->date, $time, $terminal_id, $priority_queue->queue_platform); //insert to queue_analytics
             }else if($process == 'remove'){
                 TerminalTransaction::updateTransactionTimeRemoved($transaction_number, $time);
-                //Analytics::insertAnalyticsQueueNumberRemoved($transaction_number, $priority_number->service_id, $priority_number->date, $time, $terminal_id, $priority_queue->queue_platform); //insert to queue_analytics
+                Analytics::insertAnalyticsQueueNumberRemoved($transaction_number, $priority_number->service_id, $priority_number->date, $time, $terminal_id, $priority_queue->queue_platform); //insert to queue_analytics
             }
         }else{
             return json_encode(array('error' => 'Number ' . $pnumber . ' has already been processed. If the number still exists, please reload the page.'));
@@ -339,7 +339,82 @@ class Queue extends Model
                 'terminal_id' => $terminal_id,
                 'terminal_name' => $terminal_name,
             ),
-            'numbers' => Queue::allNumbers($priority_number->service_id),
+            //'numbers' => Queue::allNumbers($priority_number->service_id, $terminal_id), //ARA removed all numbers to prevent redundant database query
         ));
+    }
+
+    public static function issueMultipleNumbers($data){
+        $terminal_id = QueueSettings::terminalSpecificIssue($data->service_id) ? $data->terminal_id : 0;
+        $next_number = Queue::nextNumber(Queue::lastNumberGiven($data->service_id), QueueSettings::numberStart($data->service_id), QueueSettings::numberLimit($data->service_id));
+        $queue_platform = $data->number_start == $next_number || $data->number_start == null ? 'web' : 'specific';
+        $number_start = $data->number_start == null ? $next_number : $data->number_start;
+
+        $result = Queue::issueMultiple($data->service_id, $number_start, $data->range, $data->date, $queue_platform, $terminal_id);
+        $result['success'] = 1;
+        return json_encode($result);
+    }
+
+    public static function issueMultiple($service_id, $first_number, $range, $date = null, $queue_platform = 'web', $terminal_id = 0, $user_id = null){
+        $date = $date == null ? mktime(0, 0, 0, date('m'), date('d'), date('Y')) : $date;
+
+        $service_properties = Queue::getServiceProperties($service_id, $date);
+        $number_start = $service_properties->number_start;
+        $number_limit = $service_properties->number_limit;
+        $last_number_given = $service_properties->last_number_given;
+        $current_number = $service_properties->current_number;
+
+        $time_queued = time();
+        $user_id = 0;
+        $user_id = $user_id == null? Helper::userId() : $user_id;
+        $priority_number = $first_number;
+
+        $terminal_transaction_data = array();
+        $analytics_data = array();
+        //@todo insert bulk to priority number table and get track ids
+        for($i = 1; $i <= $range; $i++){
+            $track_id = PriorityNumber::createPriorityNumber($service_id, $number_start, $number_limit, $last_number_given, $current_number, $date);
+            $confirmation_code = strtoupper(substr(md5($track_id), 0, 4));
+            $transaction_number = PriorityQueue::createPriorityQueue($track_id, $priority_number, $confirmation_code, $user_id, $queue_platform);
+
+            $terminal_transaction_data[] = array(
+                'transaction_number' => $transaction_number,
+                'time_queued' => $time_queued,
+                'terminal_id' => $terminal_id
+            );
+
+            $analytics_data[] = array(
+                'transaction_number' => $transaction_number,
+                'date' => $date,
+                'business_id' => Business::getBusinessIdByServiceId($service_id),
+                'branch_id' => Service::branchId($service_id),
+                'service_id' => $service_id,
+                'terminal_id' => $terminal_id,
+                'queue_platform' => $queue_platform,
+                'user_id' => Helper::userId(),
+                'action' => 0,
+                'action_time' => $time_queued
+            );
+
+            $last_number_given = $priority_number;
+            $priority_number++;
+        }
+
+
+        //@todo insert bulk to priority queue and get transaction numbers
+        TerminalTransaction::insert($terminal_transaction_data); //insert bulk to terminal transaction
+        Analytics::saveQueueAnalytics($analytics_data); //insert bulk to analytics
+        return array('first_number' => $first_number, 'last_number' => $last_number_given);
+    }
+
+    public static function rateUser($data){
+        $date = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
+        $business_id = Business::getBusinessIdByTerminalId($data->terminal_id);
+        $user = User::searchByEmail($data->email);
+        $user_id = $user["user_id"];
+        $terminal_user_id = Helper::userId();
+
+        UserRating::rateUser($date, $business_id, $data->rating, $user_id, $terminal_user_id, $data->action);
+
+        return json_encode(['success' => 1]);
     }
 }
