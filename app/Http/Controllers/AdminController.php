@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Helper;
 use App\Models\Business;
 use App\Models\UserBusiness;
 use App\Models\User;
@@ -19,26 +20,38 @@ class AdminController extends Controller
 {
 
     /**
-     * @api {get} /admin/stats/{date_start}/{date_end} Retrieve business analytics.
-     * @apiName Admin Analytics
+     * @api {get} /admin/stats/{date_start}/{date_end} Retrieve Business Analytics.
+     * @apiName AdminAnalytics
      * @apiGroup Admin
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
-     *     https://api.featherq.com/admin/analytics/20150101/20150130
+     *     https://api.featherq.com/admin/stats/20150101/20150130
      * @apiDescription Retrieve business information
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
      *
-     * @apiParam {Date} date_start Start date in which to query businesses. Format should be Ymd.
-     * @apiParam {Date} end_date End date in which to query businesses. Format should be Ymd.
+     * @apiParam {Date} date_start Start date in which to query businesses. Format should be <code>Ymd</code>.
+     * @apiParam {Date} end_date End date in which to query businesses. Format should be <code>Ymd</code>.
      *
-     * @apiSuccess (200) {Boolean} success Process success flag.
+     * @apiSuccess (200) {Number} success Process success flag.
      * @apiSuccess (200) {Number} business_count Business count.
      * @apiSuccess (200) {Array} business_information Array of business information.
+     * @apiSuccess (200) {String} business_information.business_name Name of business.
+     * @apiSuccess (200) {String} business_information.name Name of business owner.
+     * @apiSuccess (200) {String} business_information.email Address of business owner.
+     * @apiSuccess (200) {String} business_information.phone Contact number of business owner.
      * @apiSuccess (200) {Number} users_count User count.
      * @apiSuccess (200) {Array} users_information Array of user details.
+     * @apiSuccess (200) {String} users_information.first_name First name of user.
+     * @apiSuccess (200) {String} users_information.last_name Last name of user.
+     * @apiSuccess (200) {String} users_information.email Email of user.
+     * @apiSuccess (200) {String} users_information.phone Contact number of user.
      * @apiSuccess (200) {Array} business_numbers Business queue information.
+     * @apiSuccess (200) {Number} business_numbers.issued_numbers Issued numbers count.
+     * @apiSuccess (200) {Number} business_numbers.called_numbers Called numbers count.
+     * @apiSuccess (200) {Number} business_numbers.served_numbers Served numbers count.
+     * @apiSuccess (200) {Number} business_numbers.dropped_numbers Dropped numbers count.
      *
      * @apiSuccessExample {Json} Success-Response:
      *     HTTP/1.1 200 OK
@@ -76,24 +89,24 @@ class AdminController extends Controller
      *          }
      *      }
      *
-     * @apiError (Error) {Boolean} success Process fail flag.
-     * @apiError (Error) {String} err_code Unauthorized User does not have admin rights.
+     * @apiError (Error) {Number} success Process fail flag.
+     * @apiError (Error) {String} err_code UnauthorizedUser User does not have admin rights.
+     * @apiError (Error) {String} err_code InvalidInput Invalid input/s found.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "success": 0,
-     *       "err_code": "Unauthorized"
+     *       "err_code": "UnauthorizedUser"
      *     }
      */
     public function getBusinessnumbers($start_date = null, $end_date = null)
     {
         // TODO check permissions of API user, add authentication here.
         if (true) {
-            // FIXME common method to handle date format checking
-            if (is_null($start_date) || is_null($end_date)) {
+            if (is_null($start_date) || is_null($end_date) || !Helper::is_Ymd($start_date) || !Helper::is_Ymd($end_date)) {
                 return json_encode(array(
                     'success' => 0,
-                    'err_code' => 'Invalid input.'
+                    'err_code' => 'InvalidInput'
                 ));
             }
 
@@ -161,25 +174,25 @@ class AdminController extends Controller
         } else {
             return json_encode(array(
                 'success' => 0,
-                'err_code' => 'Unauthorized'
+                'err_code' => 'UnauthorizedUser'
             ));
         }
     }
 
     /**
      * @api {get} /admin/list Retrieve admin emails.
-     * @apiName Admin List
+     * @apiName AdminList
      * @apiGroup Admin
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
      *     https://api.featherq.com/admin/list
-     * @apiDescription Retrieve admin information.
+     * @apiDescription Retrieve admin emails.
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
      *
      *
-     * @apiSuccess (200) {Boolean} success Process success/fail flag.
+     * @apiSuccess (200) {Number} success Process success/fail flag.
      * @apiSuccess (200) {Array} admins Array containing the emails of administrators.
      *
      * @apiSuccessExample {Json} Success-Response:
@@ -192,15 +205,15 @@ class AdminController extends Controller
      *          ]
      *      }
      *
-     * @apiError (Error) {Boolean} success Process fail flag.
-     * @apiError (Error) {String} err_code Unauthorized User does not have admin rights.
+     * @apiError (Error) {Number} success Process fail flag.
+     * @apiError (Error) {String} err_code UnauthorizedUser User does not have admin rights.
      * @apiError (Error) {String} err_code Invalid Invalid input.
      *
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "success": 0,
-     *       "err_code": "Unauthorized"
+     *       "err_code": "UnauthorizedUser"
      *     }
      */
     public function getAdmins()
@@ -211,14 +224,14 @@ class AdminController extends Controller
         } else {
             return json_encode(array(
                 'success' => 0,
-                'err_code' => 'Unauthorized'
+                'err_code' => 'UnauthorizedUser'
             ));
         }
     }
 
     /**
-     * @api {post} /admin/add/{email} Add admin.
-     * @apiName Admin Registration
+     * @api {post} /admin/add/{email} Add Admin.
+     * @apiName AdminRegistration
      * @apiGroup Admin
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
@@ -227,9 +240,9 @@ class AdminController extends Controller
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
+     * @apiParam {String} email Unique email of admin.
      *
-     *
-     * @apiSuccess (200) {Boolean} success Process success flag.
+     * @apiSuccess (200) {Number} success Process success flag.
      *
      * @apiSuccessExample {Json} Success-Response:
      *     HTTP/1.1 200 OK
@@ -237,16 +250,16 @@ class AdminController extends Controller
      *          "success": 1
      *      }
      *
-     * @apiError (Error) {Boolean} success Process fail flag.
-     * @apiError (Error) {String} err_code Unauthorized User does not have admin rights.
-     * @apiError (Error) {String} err_code Invalid Invalid input.
-     * @apiError (Error) {String} err_code Unknown Failed to add admin.
+     * @apiError (Error) {Number} success Process fail flag.
+     * @apiError (Error) {String} err_code UnauthorizedUser User does not have admin rights.
+     * @apiError (Error) {String} err_code InvalidEmail The email entered has an invalid format..
+     * @apiError (Error) {String} err_code SomethingWentWrong Something went wrong while adding the user. Please try again.
      *
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "success": 0,
-     *       "err_code": "Unauthorized"
+     *       "err_code": "UnauthorizedUser"
      *     }
      */
     public function addAdmin($email = null)
@@ -258,7 +271,7 @@ class AdminController extends Controller
                 if (is_null($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     return json_encode(array(
                         'success' => 0,
-                        'err_code' => 'Invalid input.'
+                        'err_code' => 'InvalidEmail'
                     ));
                 }
 
@@ -275,20 +288,20 @@ class AdminController extends Controller
             } catch (Exception $e) {
                 return json_encode(array(
                     'success' => 0,
-                    'err_code' => 'Failed to add to admin list'
+                    'err_code' => 'SomethingWentWrong'
                 ));
             }
         } else {
             return json_encode(array(
                 'success' => 0,
-                'err_code' => 'Unauthorized'
+                'err_code' => 'UnauthorizedUser'
             ));
         }
     }
 
     /**
-     * @api {delete} /admin/delete/{email} Delete admin.
-     * @apiName Admin Deletion
+     * @api {delete} /admin/delete/{email} Delete Admin.
+     * @apiName AdminDeletion
      * @apiGroup Admin
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
@@ -297,9 +310,9 @@ class AdminController extends Controller
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
+     * @apiParam {String} email Unique email of admin.
      *
-     *
-     * @apiSuccess (200) {Boolean} success Process success flag.
+     * @apiSuccess (200) {Number} success Process success flag.
      *
      * @apiSuccessExample {Json} Success-Response:
      *     HTTP/1.1 200 OK
@@ -307,16 +320,16 @@ class AdminController extends Controller
      *          "success": 1
      *      }
      *
-     * @apiError (Error) {Boolean} success Process fail flag.
-     * @apiError (Error) {String} err_code Unauthorized User does not have admin rights.
-     * @apiError (Error) {String} err_code Invalid Invalid input.
-     * @apiError (Error) {String} err_code Unknown Failed to add admin.
+     * @apiError (Error) {Number} success Process fail flag.
+     * @apiError (Error) {String} err_code UnauthorizedUser User does not have admin rights.
+     * @apiError (Error) {String} err_code InvalidEmail The email entered has an invalid format..
+     * @apiError (Error) {String} err_code SomethingWentWrong Something went wrong while adding the user. Please try again.
      *
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "success": 0,
-     *       "err_code": "Unauthorized"
+     *       "err_code": "UnauthorizedUser"
      *     }
      */
     public static function removeAdmin($email)
@@ -327,7 +340,7 @@ class AdminController extends Controller
                 if (is_null($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     return json_encode(array(
                         'success' => 0,
-                        'err_code' => 'Invalid input.'
+                        'err_code' => 'InvalidEmail'
                     ));
                 }
 
@@ -344,31 +357,36 @@ class AdminController extends Controller
             } catch (Exception $e) {
                 return json_encode(array(
                     'success' => 0,
-                    'err_code' => 'Failed to add to admin list'
+                    'err_code' => 'SomethingWentWrong'
                 ));
             }
         } else {
             return json_encode(array(
                 'success' => 0,
-                'err_code' => 'Unauthorized'
+                'err_code' => 'UnauthorizedUser'
             ));
         }
     }
 
     /**
-     * @api {post} /admin/features/update Update business features.
-     * @apiName Business features update
+     * @api {post} /admin/features/update/{business_id} Update Business Features.
+     * @apiName UpdateBusinessFeatures
      * @apiGroup Admin
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
-     *     https://api.featherq.com/admin/features/update
+     *     https://api.featherq.com/admin/features/update/123123
      * @apiDescription Update business features information.
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
      *
+     * @apiParam {String} business_id Unique ID of business to add this feature to.
+     * @apiParam {Object} data JSON object to be serialized.
+     * @apiParam {Boolean} data.allow_sms Allow SMS flag.
+     * @apiParam {Boolean} data.queue_forwarding Queue forwarding flag.
+     * @apiParam {Number} data.terminal_users Terminal users count.
      *
-     * @apiSuccess (200) {Boolean} success Process success flag.
+     * @apiSuccess (200) {Number} success Process success flag.
      *
      * @apiSuccessExample {Json} Success-Response:
      *     HTTP/1.1 200 OK
@@ -376,14 +394,15 @@ class AdminController extends Controller
      *          "success": 1
      *      }
      *
-     * @apiError (Error) {Boolean} success Process fail flag.
-     * @apiError (Error) {String} err_code Unauthorized User does not have admin rights.
+     * @apiError (Error) {Number} success Process fail flag.
+     * @apiError (Error) {String} err_code UnauthorizedUser User does not have admin rights.
+     * @apiError (Error) {String} err_code BusinessNotFound No business matched using <code>business_id</code>
      *
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "success": 0,
-     *       "err_code": "Unauthorized"
+     *       "err_code": "UnauthorizedUser"
      *     }
      */
     public function postSaveFeatures($business_id = null)
@@ -400,20 +419,20 @@ class AdminController extends Controller
             } else {
                 return json_encode(array(
                     'success' => 0,
-                    'err_code' => 'Business does not exist'
+                    'err_code' => 'BusinessNotFound'
                 ));
             }
         } else {
             return json_encode(array(
                 'success' => 0,
-                'err_code' => 'Unauthorized'
+                'err_code' => 'UnauthorizedUser'
             ));
         }
     }
 
     /**
-     * @api {get} /admin/features/{business_id} Retrieve business features.
-     * @apiName Retrieve business features
+     * @api {get} /admin/features/{business_id} Retrieve Business Features.
+     * @apiName RetrieveBusinessFeatures
      * @apiGroup Admin
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
@@ -423,9 +442,10 @@ class AdminController extends Controller
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
      *
+     * @apiParam {String} business_id Unique ID of business to retrieve.
      *
-     * @apiSuccess (200) {Boolean} success Process success flag.
-     * @apiSuccess (200) {Object} features Business features.
+     * @apiSuccess (200) {Number} success Process success flag.
+     * @apiSuccess (200) {Object} features Business features. This object should be serialized.
      *
      * @apiSuccessExample {Json} Success-Response:
      *     HTTP/1.1 200 OK
@@ -437,15 +457,15 @@ class AdminController extends Controller
      *          }
      *      }
      *
-     * @apiError (Error) {Boolean} success Process fail flag.
-     * @apiError (Error) {String} err_code Unauthorized User does not have admin rights.
-     * @apiError (Error) {String} err_code Not Found Business does not exist.
+     * @apiError (Error) {Number} success Process fail flag.
+     * @apiError (Error) {String} err_code UnauthorizedUser User does not have admin rights.
+     * @apiError (Error) {String} err_code BusinessNotFound No business matched using <code>business_id</code>
      *
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     {
      *       "success": 0,
-     *       "err_code": "Unauthorized"
+     *       "err_code": "UnauthorizedUser"
      *     }
      */
     public function getBusinessFeatures($business_id = null)
@@ -458,13 +478,13 @@ class AdminController extends Controller
             } else {
                 return json_encode(array(
                     'success' => 0,
-                    'err_code' => 'Business does not exist'
+                    'err_code' => 'BusinessNotFound'
                 ));
             }
         } else {
             return json_encode(array(
                 'success' => 0,
-                'err_code' => 'Unauthorized'
+                'err_code' => 'UnauthorizedUser'
             ));
         }
     }
