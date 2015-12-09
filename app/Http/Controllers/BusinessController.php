@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Helper;
 use App\Models\Business;
 use App\Models\Analytics;
 
@@ -104,8 +105,8 @@ class BusinessController extends Controller
     }
 
     /**
-     * @api {get} analytics/business/{business_id}{date_start}/{date_end} Retrieve business analytics
-     * @apiName Business analytics retrieval
+     * @api {get} analytics/business/{business_id}/{date_start}/{date_end} Retrieve Business Analytics.
+     * @apiName BusinessAnalyticsRetrieval
      * @apiGroup Business
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
@@ -119,7 +120,7 @@ class BusinessController extends Controller
      * @apiParam {Date} date_start Start date in which to query businesses. Format should be Ymd.
      * @apiParam {Date} end_date End date in which to query businesses. Format should be Ymd.
      *
-     * @apiSuccess (200) {Boolean} successProcess success/fail flag.
+     * @apiSuccess (200) {Number} successProcess success/fail flag.
      * @apiSuccess (200) {Number} total_numbers_issued Business count.
      * @apiSuccess (200) {Number} total_numbers_called Array of business information.
      * @apiSuccess (200) {Number} total_numbers_served User count.
@@ -139,9 +140,9 @@ class BusinessController extends Controller
      *          "average_time_served": ""
      *      }
      *
-     * @apiError (Error) {String} success Process fail flag.
-     * @apiError (Error) {String} err_code Not Found Business ID was not found.
-     * @apiError (Error) {String} err_code Invalid Invalid input.
+     * @apiError (Error) {Number} success Process fail flag.
+     * @apiError (Error) {String} err_code BusinessNotFound Business ID was not found.
+     * @apiError (Error) {String} err_code InvalidInput Invalid input.
      *
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
@@ -150,23 +151,25 @@ class BusinessController extends Controller
      *       "err_code": "Business does not exist"
      *     }
      */
-    public function businessAnalytics($business_id, $start_date, $end_date)
+    public function businessAnalytics($business_id = null, $start_date = null, $end_date = null)
     {
         $business = Business::getBusinessByBusinessId($business_id);
         if (is_null($business)) {
             return json_encode(array(
                 'success' => 0,
-                'err_code' => 'Business does not exist'
+                'err_code' => 'BusinessNotFound'
             ));
         }
-        // FIXME common method to handle date format checking
-        if (is_null($start_date) || is_null($end_date)) {
+
+        if (is_null($start_date) || is_null($end_date) || !Helper::is_Ymd($start_date) || !Helper::is_Ymd($end_date)) {
             return json_encode(array(
                 'success' => 0,
-                'err_code' => 'Invalid input.'
+                'err_code' => 'InvalidInput'
             ));
         }
-        $analytics = Analytics::getBusinessAnalytics($business_id, strtotime($start_date), strtotime($end_date));
+        $temp_start_date = date_create_from_format('Ymd', $start_date);
+        $temp_end_date = date_create_from_format('Ymd', $end_date);
+        $analytics = Analytics::getBusinessAnalytics($business_id, $temp_start_date->getTimestamp(), $temp_end_date->getTimestamp());
         return json_encode($analytics);
     }
 }
