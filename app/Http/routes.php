@@ -71,7 +71,7 @@ $app->put('terminals/{id}', 'TerminalController@putUpdateTerminalName');
 $app->delete('terminals/{id}', 'TerminalController@deleteRemoveTerminal');
 
 //RESTFUL queue routes
-$app->get('queue/numbers/{id}', 'QueueController@getAllNumbers');
+$app->get('queue/numbers/{terminal_id}', 'QueueController@getAllNumbers');
 
 $app->put('queue/serve', 'QueueController@putServeNumber');
 
@@ -81,4 +81,4 @@ $app->put('queue/call', 'QueueController@putCallNumber');
 
 $app->post('queue/insert-multiple', 'QueueController@postIssueMultiple');
 
-$app->post('queue/user/rate', 'QueueController@postUserRating');
+$app->post('queue/user/rating', 'QueueController@postUserRating');

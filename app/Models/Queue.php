@@ -49,7 +49,11 @@ class Queue extends Model
     }
 
     public static function terminalNumbers($terminal_id, $date = null){
-        return Queue::allNumbers(Terminal::serviceId($terminal_id), $terminal_id, $date);
+        if(Terminal::where('terminal_id', '=', $terminal_id)->exists()){
+            return Queue::allNumbers(Terminal::serviceId($terminal_id), $terminal_id, $date);
+        }else{
+            return json_encode(['error' => 'Terminal does not exist.']);
+        }
     }
 
     public static function allNumbers($service_id, $terminal_id = null, $date = null)
@@ -96,6 +100,7 @@ class Queue extends Model
                         'name' => $number->name,
                         'phone' => $number->phone,
                         'email' => $number->email,
+                        'time_assigned' => $number->time_assigned,
                     );
                 } else if (!$called && !$removed && $terminal_specific_calling && ($number->terminal_id == $terminal_id || $number->terminal_id == 0)) {
                     $uncalled_numbers[] = array(
@@ -344,13 +349,18 @@ class Queue extends Model
     }
 
     public static function issueMultipleNumbers($data){
-        $terminal_id = QueueSettings::terminalSpecificIssue($data->service_id) ? $data->terminal_id : 0;
-        $next_number = Queue::nextNumber(Queue::lastNumberGiven($data->service_id), QueueSettings::numberStart($data->service_id), QueueSettings::numberLimit($data->service_id));
-        $queue_platform = $data->number_start == $next_number || $data->number_start == null ? 'web' : 'specific';
-        $number_start = $data->number_start == null ? $next_number : $data->number_start;
+        if($data->terminal_id && $data->service_id && $data->number_start && $data->range){
+            $terminal_id = QueueSettings::terminalSpecificIssue($data->service_id) ? $data->terminal_id : 0;
+            $next_number = Queue::nextNumber(Queue::lastNumberGiven($data->service_id), QueueSettings::numberStart($data->service_id), QueueSettings::numberLimit($data->service_id));
+            $queue_platform = $data->number_start == $next_number || $data->number_start == null ? 'web' : 'specific';
+            $number_start = $data->number_start == null ? $next_number : $data->number_start;
 
-        $result = Queue::issueMultiple($data->service_id, $number_start, $data->range, $data->date, $queue_platform, $terminal_id);
-        $result['success'] = 1;
+            $result = Queue::issueMultiple($data->service_id, $number_start, $data->range, $data->date, $queue_platform, $terminal_id);
+            $result['success'] = 1;
+        }else{
+            $result['error'] = 'You have missing parameters';
+        }
+
         return json_encode($result);
     }
 
@@ -407,14 +417,19 @@ class Queue extends Model
     }
 
     public static function rateUser($data){
-        $date = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
-        $business_id = Business::getBusinessIdByTerminalId($data->terminal_id);
-        $user = User::searchByEmail($data->email);
-        $user_id = $user["user_id"];
-        $terminal_user_id = Helper::userId();
+        if($data->rating && $data->email && $data->terminal_id && $data->action){
+            $date = mktime(0, 0, 0, date('m'), date('d'), date('Y'));
+            $business_id = Business::getBusinessIdByTerminalId($data->terminal_id);
+            $user = User::searchByEmail($data->email);
+            $user_id = $user["user_id"];
+            $terminal_user_id = Helper::userId();
 
-        UserRating::rateUser($date, $business_id, $data->rating, $user_id, $terminal_user_id, $data->action);
+            UserRating::rateUser($date, $business_id, $data->rating, $user_id, $terminal_user_id, $data->action);
 
-        return json_encode(['success' => 1]);
+            return json_encode(['success' => 1]);
+        }else{
+            return json_encode(['error' => 'You have missing parameters.']);
+        }
+
     }
 }

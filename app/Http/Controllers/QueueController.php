@@ -99,7 +99,136 @@ class QueueController extends Controller {
     }
 
     /**
-     * ok
+     * @api {get} queue/numbers/{terminal_id} Get Terminal Numbers
+     * @apiName GetTerminalNumbers
+     * @apiGroup Queue
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/queue/numbers/1
+     * @apiDescription This function gets all the called, served, dropped, and issued numbers that are relevant to te terminal.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Authenticated User
+     *
+     * @apiSuccess (200) {Number} success The boolean flag of the successful process.
+     * @apiSuccess (200) {Object} numbers Contains information about the queue numbers.
+     * @apiSuccess (200) {Number} numbers.last_number_given The last number given to a person on the queue.
+     * @apiSuccess (200) {Number} numbers.next_number The next number in the queue to be called.
+     * @apiSuccess (200) {Number} numbers.current_number The current number being called in the queue.
+     * @apiSuccess (200) {Number} numbers.number_limit The maximum priority number to be issued to the queue.
+     *
+     * @apiSuccess (200) {Object[]} numbers.called_numbers The numbers that are already called in the queue.
+     * @apiSuccess (200) {Object} numbers.called_number.number The information about the priority number.
+     * @apiSuccess (200) {Number} numbers.called_number.number.transaction_number The transaction number of the queued number.
+     * @apiSuccess (200) {Number} numbers.called_number.number.priority_number The number representation of the queued number.
+     * @apiSuccess (200) {String} numbers.called_number.number.confirmation_code The encryted code representation of the queued number.
+     * @apiSuccess (200) {Number} numbers.called_number.number.terminal_id The id of the calling terminal.
+     * @apiSuccess (200) {String} numbers.called_number.number.terminal_name The name of the calling terminal.
+     * @apiSuccess (200) {Number} numbers.called_number.number.time_called The time (<code>time()</code>) on which the number was called.
+     * @apiSuccess (200) {String} numbers.called_number.number.name The name of the user assigned to that number.
+     * @apiSuccess (200) {String} numbers.called_number.number.phone The mobile phone number of the user assigned to that number.
+     * @apiSuccess (200) {String} numbers.called_number.number.email The email address of the user assigned to that number.
+     * @apiSuccess (200) {Number} numbers.called_number.number.box_rank The ranking in which the number will be view in the broadcast screen.
+     *
+     * @apiSuccess (200) {Object[]} numbers.uncalled_numbers The numbers that are still to be called in the queue.
+     * @apiSuccess (200) {Object} numbers.uncalled_number.number The information about the priority number.
+     * @apiSuccess (200) {Number} numbers.uncalled_number.number.transaction_number The transaction number of the queued number.
+     * @apiSuccess (200) {Number} numbers.uncalled_number.number.priority_number The number representation of the queued number.
+     * @apiSuccess (200) {String} numbers.uncalled_number.number.name The name of the user assigned to that number.
+     * @apiSuccess (200) {String} numbers.uncalled_number.number.phone The mobile phone number of the user assigned to that number.
+     * @apiSuccess (200) {String} numbers.uncalled_number.number.email The email address of the user assigned to that number.
+     *
+     * @apiSuccess (200) {Object[]} numbers.processed_numbers The numbers that already served/removed from the queue.
+     * @apiSuccess (200) {Object} numbers.processed_number.number The information about the priority number.
+     * @apiSuccess (200) {Number} numbers.processed_number.number.transaction_number The transaction number of the queued number.
+     * @apiSuccess (200) {Number} numbers.processed_number.number.priority_number The number representation of the queued number.
+     * @apiSuccess (200) {String} numbers.processed_number.number.confirmation_code The encryted code representation of the queued number.
+     * @apiSuccess (200) {Number} numbers.processed_number.number.terminal_id The id of the calling terminal.
+     * @apiSuccess (200) {String} numbers.processed_number.number.terminal_name The name of the calling terminal.
+     * @apiSuccess (200) {Number} numbers.processed_number.number.time_processed The time (<code>time()</code>) on which the number was processed.
+     *
+     * @apiSuccess (200) {Object[]} numbers.timebound_numbers The numbers that are not yet called but have specific times to be called in the queue
+     * @apiSuccess (200) {Object} numbers.timebound_number.number The information about the priority number.
+     * @apiSuccess (200) {Number} numbers.timebound_number.number.transaction_number The transaction number of the queued number.
+     * @apiSuccess (200) {Number} numbers.timebound_number.number.priority_number The number representation of the queued number.
+     * @apiSuccess (200) {String} numbers.timebound_number.number.name The name of the user assigned to that number.
+     * @apiSuccess (200) {String} numbers.timebound_number.number.phone The mobile phone number of the user assigned to that number.
+     * @apiSuccess (200) {String} numbers.timebound_number.number.email The email address of the user assigned to that number.
+     * @apiSuccess (200) {Number} numbers.timebound_number.number.time_assigned The time (<code>time()</code>) on which the number is set to be called.
+     *
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *          "success": 1
+     *          "numbers":
+     *              {
+     *                  "last_number_given": "20",
+     *                  "next_number": 21,
+     *                  "current_number": 0,
+     *                  "number_limit": 9999,
+     *                  "called_numbers":
+     *                      [
+     *                          {
+     *                              "transaction_number": 10332,
+     *                              "priority_number": "16",
+     *                              "confirmation_code": "4E96",
+     *                              "terminal_id": 462,
+     *                              "terminal_name": "Monster Terminal 1",
+     *                              "time_called": 1449645142,
+     *                              "name": null,
+     *                              "phone": null,
+     *                              "email": null,
+     *                              "box_rank": 1
+     *                          },
+     *                      ],
+     *                  "uncalled_numbers":
+     *                      [
+     *                          {
+     *                              "transaction_number": 10332,
+     *                              "priority_number": "16",
+     *                              "name": null,
+     *                              "phone": null,
+     *                              "email": null
+     *                          },
+     *                      ],
+     *                  "processed_numbers":
+     *                      [
+     *                          {
+     *                              "transaction_number": 10331,
+     *                              "priority_number": "15",
+     *                              "confirmation_code": "B974",
+     *                              "terminal_id": 462,
+     *                              "terminal_name": "Monster Terminal 1",
+     *                              "time_processed": 1449643314,
+     *                              "status": "Served"
+     *                          },
+     *                      ],
+     *                  "timebound_numbers":
+     *                      [
+     *                          {
+     *                              "transaction_number": 10332,
+     *                              "priority_number": "16",
+     *                              "time_assigned": 1449645142,
+     *                              "name": null,
+     *                              "phone": null,
+     *                              "email": null,
+     *                              "box_rank": 1
+     *                          },
+     *                      ]
+     *                  }
+     *              }
+     *          }
+     *     ]
+     *
+     * @apiError (Error) {String} error The error message.
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *         "error": "Terminal does not exist."
+     *       },
+     *     ]
      */
     public function getAllNumbers($terminal_id){
         $numbers = Queue::terminalNumbers($terminal_id);
@@ -107,7 +236,37 @@ class QueueController extends Controller {
     }
 
     /**
-     * ok
+     * @api {put} queue/call Call Number
+     * @apiName PutCallNumber
+     * @apiGroup Queue
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/queue/call
+     * @apiDescription This function tags a priority number as called and will be updated to the broadcast screen.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Authenticated User
+     *
+     * @apiParam {Number} terminal_id The id of the terminal calling the number.
+     * @apiParam {Number} transaction_number The transaction number of the number being called.
+     *
+     * @apiSuccess (200) {Number} success The boolean flag of the successful process.
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *          "success": 1
+     *       }
+     *     ]
+     *
+     * @apiError (Error) {String} error The error message.
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *         "error": "Number 1 has already been called. Please call another number."
+     *       },
+     *     ]
      */
     public function putCallNumber(){
         $transaction_number = Input::get('transaction_number');
@@ -116,7 +275,36 @@ class QueueController extends Controller {
     }
 
     /**
-     * ok
+     * @api {put} queue/serve Serve Number
+     * @apiName PutServeNumber
+     * @apiGroup Queue
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/queue/serve
+     * @apiDescription This function tags a priority number as served and will be removed from the broadcast screen.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Authenticated User
+     *
+     * @apiParam {Number} transaction_number The transaction number of the number being served.
+     *
+     * @apiSuccess (200) {Number} success The boolean flag of the successful process.
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *          "success": 1
+     *       }
+     *     ]
+     *
+     * @apiError (Error) {String} error The error message.
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *         "error": "Number 1 has already been processed. If the number still exists, please reload the page."
+     *       },
+     *     ]
      */
     public function putServeNumber(){
         $transaction_number = Input::get('transaction_number');
@@ -124,7 +312,36 @@ class QueueController extends Controller {
     }
 
     /**
-     * ok
+     * @api {put} queue/drop Drop Number
+     * @apiName PutDropNumber
+     * @apiGroup Queue
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/queue/drop
+     * @apiDescription This function tags a priority number as dropped and will be removed from the broadcast screen.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Authenticated User
+     *
+     * @apiParam {Number} transaction_number The transaction number of the number being dropped.
+     *
+     * @apiSuccess (200) {Number} success The boolean flag of the successful process.
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *          "success": 1
+     *       }
+     *     ]
+     *
+     * @apiError (Error) {String} error The error message.
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *         "error": "Number 1 has already been processed. If the number still exists, please reload the page."
+     *       },
+     *     ]
      */
     public function putDropNumber(){
         $transaction_number = Input::get('transaction_number');
@@ -133,7 +350,44 @@ class QueueController extends Controller {
 
 
     /**
-     * ok
+     * @api {post} queue/insert-multiple Insert Multiple Numbers
+     * @apiName PostInsertMultiple
+     * @apiGroup Queue
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/queue/insert-multiple
+     * @apiDescription This function issues multiple numbers to a service depending on user's specifications
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Authenticated User
+     *
+     * @apiParam {Number} service_id The id of the service to queue.
+     * @apiParam {Number} terminal_id The id of the terminal to queue.
+     * @apiParam {Number} number_start The first number of the range to be issued.
+     * @apiParam {Number} range The range of how many numbers are to be issued.
+     * @apiParam {String} [date] The timestamp format (<code>mktime(0, 0, 0, date('m'), date('d'), date('Y'))</code>) of the date the queue is requested.
+     *
+     * @apiSuccess (200) {Number} success The boolean flag of the successful process.
+     * @apiSuccess (200) {Number} first_number The first number issued in the process.
+     * @apiSuccess (200) {Number} last_number The the last number issued after the process.
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *          "success": 1,
+     *          "first_number": 1,
+     *          "last_number": 10
+     *       }
+     *     ]
+     *
+     * @apiError (Error) {String} error The error message.
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *         "error": "You have missing parameters."
+     *       },
+     *     ]
      */
     public function postIssueMultiple(){
         $data = new \stdClass();
@@ -147,7 +401,39 @@ class QueueController extends Controller {
     }
 
     /**
-     * ok
+     * @api {post} queue/user/rating Rate User
+     * @apiName PostRateUser
+     * @apiGroup Queue
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/queue/user/rating
+     * @apiDescription This function gives a rating to the user the queued to the terminal.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Authenticated User
+     *
+     * @apiParam {String} email The email address of the user to be rated.
+     * @apiParam {Number} terminal_id The id of the terminal rating the user.
+     * @apiParam {Number} rating The rating of user given by the terminal.
+     * @apiParam {Number} action The action done while rating the user (2 = serve, 3 = drop).
+     *
+     * @apiSuccess (200) {Number} success The boolean flag of the successful process.
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *          "success": 1,
+     *       }
+     *     ]
+     *
+     * @apiError (Error) {String} error The error message.
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     [
+     *       {
+     *         "error": "You have missing parameters."
+     *       },
+     *     ]
      */
     public function postUserRating(){
         $data = new \stdClass();
