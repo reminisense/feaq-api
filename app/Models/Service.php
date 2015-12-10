@@ -49,8 +49,19 @@ class Service extends Model{
      */
     public static function createBusinessService($business_id, $name)
     {
+        if($name == ''){return json_encode(['success' => 0, 'err_code' => 'MissingNameField']);}
+        if(!Business::where('business_id', '=', $business_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoBusinessFound']);}
+
+        $service_name_exists = Service::join('branch', 'service.branch_id', '=', 'branch.branch_id')
+            ->join('business', 'branch.business_id', '=', 'business.business_id')
+            ->where('business.business_id', '=', $business_id)
+            ->where('service.name', '=', $name)
+            ->exists();
+        if($service_name_exists){return json_encode(['success' => 0, 'err_code' => 'ServiceNameExists']);}
+
         $first_branch = Branch::getFirstBranchOfBusiness($business_id);
-        return Service::createService($first_branch->branch_id, $name);
+        $service_id = Service::createService($first_branch->branch_id, $name);
+        return json_encode(['service_id' => $service_id]);
     }
 
     /*
@@ -117,15 +128,32 @@ class Service extends Model{
 
     public static function updateServiceName($service_id, $name)
     {
+        if($name == ''){return json_encode(['success' => 0, 'err_code' => 'MissingNameField']);}
+        if(!Service::where('service_id', '=', $service_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoServiceFound']);}
+
+        $business_id = Business::getBusinessIdByServiceId($service_id);
+        $service_name_exists = Service::join('branch', 'service.branch_id', '=', 'branch.branch_id')
+            ->join('business', 'branch.business_id', '=', 'business.business_id')
+            ->where('business.business_id', '=', $business_id)
+            ->where('service.name', '=', $name)
+            ->exists();
+        if($service_name_exists){return json_encode(['success' => 0, 'err_code' => 'ServiceNameExists']);}
+
+
         Service::where('service_id', '=', $service_id)->update(['name' => $name]);
+        return json_encode(['success' => 1]);
     }
 
     public static function deleteService($service_id)
     {
+        if(!Service::where('service_id', '=', $service_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoServiceFound']);}
         $terminals = Terminal::getTerminalsByServiceId($service_id);
         foreach ($terminals as $terminal) {
             Terminal::deleteTerminal($terminal['terminal_id']);
         }
+
         Service::where('service_id', '=', $service_id)->delete();
+        return json_encode(['success' => 1]);
+
     }
 }

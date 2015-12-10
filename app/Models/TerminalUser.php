@@ -27,15 +27,26 @@ class TerminalUser extends Model{
     }
 
     public static function assignTerminalUser($user_id, $terminal_id){
-        if(TerminalUser::terminalUserExists($user_id, $terminal_id)){
-            TerminalUser::updateTerminalUserStatus($user_id, $terminal_id, 1);
-        }else{
-            TerminalUser::createTerminalUser($user_id, $terminal_id);
-        }
+        if(!Terminal::where('terminal_id', '=', $terminal_id)->exists()) {return json_encode(['success' => 0, 'err_code' => 'NoTerminalFound']);}
+        if(!User::where('user_id', '=', $user_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoUserFound']);}
+
+        if(TerminalUser::terminalUserExists($user_id, $terminal_id)){ TerminalUser::updateTerminalUserStatus($user_id, $terminal_id, 1);
+        }else{ TerminalUser::createTerminalUser($user_id, $terminal_id);}
+
+        $business_id = Business::getBusinessIdByTerminalId($terminal_id);
+        $business = Business::getBusinessDetails($business_id);
+        return json_encode(['success' => 1, 'business' => $business]);
+
     }
 
     public static function unassignTerminalUser($user_id, $terminal_id){
+        if(!Terminal::where('terminal_id', '=', $terminal_id)->exists()) {return json_encode(['success' => 0, 'err_code' => 'NoTerminalFound']);}
+        if(!User::where('user_id', '=', $user_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoUserFound']);}
+
         TerminalUser::updateTerminalUserStatus($user_id, $terminal_id, 0);
+        $business_id = Business::getBusinessIdByTerminalId($terminal_id);
+        $business = Business::getBusinessDetails($business_id);
+        return json_encode(['success' => 1, 'business' => $business]);
     }
 
     public static function terminalUserExists($user_id, $terminal_id){

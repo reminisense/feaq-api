@@ -337,14 +337,14 @@ class Queue extends Model
 
         return json_encode(array(
             'success' => 1,
-            'priority_number' => array(
-                'transaction_number' => $transaction_number,
-                'priority_number' => $pnumber,
-                'confirmation_code' => $confirmation_code,
-                'terminal_id' => $terminal_id,
-                'terminal_name' => $terminal_name,
-            ),
-            //'numbers' => Queue::allNumbers($priority_number->service_id, $terminal_id), //ARA removed all numbers to prevent redundant database query
+//            'priority_number' => array(
+//                'transaction_number' => $transaction_number,
+//                'priority_number' => $pnumber,
+//                'confirmation_code' => $confirmation_code,
+//                'terminal_id' => $terminal_id,
+//                'terminal_name' => $terminal_name,
+//            ),
+//            'numbers' => Queue::allNumbers($priority_number->service_id, $terminal_id), //ARA removed all numbers to prevent redundant database query
         ));
     }
 
@@ -358,7 +358,7 @@ class Queue extends Model
             $result = Queue::issueMultiple($data->service_id, $number_start, $data->range, $data->date, $queue_platform, $terminal_id);
             $result['success'] = 1;
         }else{
-            $result['error'] = 'You have missing parameters';
+            $result['error'] = 'MissingParameters';
         }
 
         return json_encode($result);
@@ -428,7 +428,7 @@ class Queue extends Model
 
             return json_encode(['success' => 1]);
         }else{
-            return json_encode(['error' => 'You have missing parameters.']);
+            return json_encode(['error' => 'MissingParameters']);
         }
 
     }

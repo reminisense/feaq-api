@@ -221,18 +221,20 @@ class QueueController extends Controller {
      *          }
      *     ]
      *
-     * @apiError (Error) {String} error The error message.
+     * @apiError (Error) {Number} success Returns <code>0</code> for errors.
+     * @apiError (Error) {String} err_code The error message.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     [
      *       {
-     *         "error": "Terminal does not exist."
+     *         "success": 0,
+     *         "err_code": "NoTerminalFound"
      *       },
      *     ]
      */
     public function getAllNumbers($terminal_id){
-        $numbers = Queue::terminalNumbers($terminal_id);
-        return json_encode(['success' => 1, 'numbers' => $numbers], JSON_PRETTY_PRINT);
+        if(!Terminal::where('terminal_id', '=', $terminal_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoTerminalFound']);}
+        return json_encode(['success' => 1, 'numbers' => Queue::terminalNumbers($terminal_id)], JSON_PRETTY_PRINT);
     }
 
     /**
@@ -259,18 +261,22 @@ class QueueController extends Controller {
      *       }
      *     ]
      *
-     * @apiError (Error) {String} error The error message.
+     * @apiError (Error) {Number} success Returns <code>0</code> for errors.
+     * @apiError (Error) {String} err_code The error message.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     [
      *       {
-     *         "error": "Number 1 has already been called. Please call another number."
+     *          "success": 0,
+     *         "err_code": "NoTransactionNumberFound"
      *       },
      *     ]
      */
     public function putCallNumber(){
         $transaction_number = Input::get('transaction_number');
         $terminal_id = Input::get('terminal_id');
+        if(!Terminal::where('terminal_id', '=', $terminal_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoTerminalFound']);}
+        if(!TerminalTransaction::where('transaction_number', '=', $transaction_number)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoTransactionNumberFound']);}
         return Queue::callNumber($transaction_number, $terminal_id);
     }
 
@@ -297,17 +303,20 @@ class QueueController extends Controller {
      *       }
      *     ]
      *
-     * @apiError (Error) {String} error The error message.
+     * @apiError (Error) {Number} success Returns <code>0</code> for errors.
+     * @apiError (Error) {String} err_code The error message.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     [
      *       {
-     *         "error": "Number 1 has already been processed. If the number still exists, please reload the page."
+     *          "success": 0,
+     *         "err_code": "NoTransactionNumberFound"
      *       },
      *     ]
      */
     public function putServeNumber(){
         $transaction_number = Input::get('transaction_number');
+        if(!TerminalTransaction::where('transaction_number', '=', $transaction_number)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoTransactionNumberFound']);}
         return Queue::serveNumber($transaction_number);
     }
 
@@ -334,17 +343,20 @@ class QueueController extends Controller {
      *       }
      *     ]
      *
-     * @apiError (Error) {String} error The error message.
+     * @apiError (Error) {Number} success Returns <code>0</code> for errors.
+     * @apiError (Error) {String} err_code The error message.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     [
      *       {
-     *         "error": "Number 1 has already been processed. If the number still exists, please reload the page."
+     *          "success": 0,
+     *         "err_code": "NoTransactionNumberFound"
      *       },
      *     ]
      */
     public function putDropNumber(){
         $transaction_number = Input::get('transaction_number');
+        if(!TerminalTransaction::where('transaction_number', '=', $transaction_number)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoTransactionNumberFound']);}
         return Queue::dropNumber($transaction_number);
     }
 
@@ -380,12 +392,14 @@ class QueueController extends Controller {
      *       }
      *     ]
      *
-     * @apiError (Error) {String} error The error message.
+     * @apiError (Error) {Number} success Returns <code>0</code> for errors.
+     * @apiError (Error) {String} err_code The error message.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     [
      *       {
-     *         "error": "You have missing parameters."
+     *          "success": 0,
+     *         "err_code": "MissingParameters"
      *       },
      *     ]
      */
@@ -426,12 +440,14 @@ class QueueController extends Controller {
      *       }
      *     ]
      *
-     * @apiError (Error) {String} error The error message.
+     * @apiError (Error) {Number} success Returns <code>0</code> for errors.
+     * @apiError (Error) {String} err_code The error message.
      * @apiErrorExample {Json} Error-Response:
      *     HTTP/1.1 200 OK
      *     [
      *       {
-     *         "error": "You have missing parameters."
+     *          "success": 0,
+     *         "err_code": "MissingParameters"
      *       },
      *     ]
      */

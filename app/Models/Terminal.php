@@ -51,6 +51,26 @@ class Terminal extends Model
         return $terminals;
     }
 
+    public static function createBusinessTerminal($business_id, $service_id, $name){
+        if($name == ''){return json_encode(['success' => 0, 'err_code' => 'MissingNameField']);}
+        if(!Business::where('business_id', '=', $business_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoBusinessFound']);}
+        if(!Service::where('service_id', '=', $service_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoServiceFound']);}
+        $service_exists = Service::join('branch', 'service.branch_id', '=', 'branch.branch_id')
+            ->join('business', 'branch.business_id', '=', 'business.business_id')
+            ->where('business.business_id', '=', $business_id)
+            ->where('service.service_id', '=', $service_id)
+            ->exists();
+        if(!$service_exists){return json_encode(['success' => 0, 'err_code' => 'ServiceNotInBusiness']);}
+
+        if (!Terminal::validateTerminalName($business_id, $name, 0)) {
+            return json_encode(['status' => 0, 'err_code' => 'TerminalNameExists']);
+        }
+
+        Terminal::createTerminal($service_id, $name);
+        $business = Business::getBusinessDetails($business_id);
+        return json_encode(['success' => 1, 'business' => $business]);
+    }
+
     /*
      * @author: CSD
      * @description: fetch terminals by service id
@@ -104,14 +124,21 @@ class Terminal extends Model
     }
 
     public static function deleteTerminal($terminal_id){
+        if(!Terminal::where('terminal_id', '=', $terminal_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoTerminalFound']);}
+        if (TerminalTransaction::terminalActiveNumbers($terminal_id) != 0) {return json_encode(['status' => 0, 'err_code' => 'PendingNumbersExist']);}
+
+        $business_id = Business::getBusinessIdByTerminalId($terminal_id);
         TerminalUser::where('terminal_id', '=', $terminal_id)->delete();
         Terminal::where('terminal_id', '=', $terminal_id)->delete();
+        $business = Business::getBusinessDetails($business_id);
+        return json_encode(['success' => 1, 'business' => $business]);
+
     }
 
     public static function createBusinessNewTerminal($business_id, $name){
         $first_branch = Branch::where('business_id', '=', $business_id)->first();
         $first_service = Service::where('branch_id', '=', $first_branch->branch_id)->first();
-        Terminal::createTerminal($first_service->service_id);
+        return Terminal::createTerminal($first_service->service_id, $name);
     }
 
     // Added by PAG
@@ -136,7 +163,12 @@ class Terminal extends Model
     }
 
     public static function setName($terminal_id, $name) {
+        if($name == ''){return json_encode(['success' => 0, 'err_code' => 'MissingNameField']);}
+        if(!Terminal::where('terminal_id', '=', $terminal_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoTerminalFound']);}
+        $business_id = Business::getBusinessIdByTerminalId($terminal_id);
+        if (!Terminal::validateTerminalName($business_id, $name, $terminal_id)) {return json_encode(['success' => 0, 'err_code' => 'TerminalNameExists.']);}
         Terminal::where('terminal_id', '=', $terminal_id)->update(array('name' => $name));
+        return json_encode(['success' => 1]);
     }
 
     public static function deleteTerminalsByServiceId($service_id) {

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Input;
 class ServiceController extends Controller{
     /**
      * @api {post} /services Create Service
-     * @apiName Create Service
+     * @apiName CreateService
      * @apiGroup Service
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage
@@ -36,27 +36,22 @@ class ServiceController extends Controller{
      *      }
      *
      * @apiError (Error) {Number} success Returns <code>0</code> if the service creation fails.
-     * @apiError (Error) {String} error_message Gives the reason for the service creation failure.
+     * @apiError (Error) {String} err_code Gives the reason for the service creation failure.
      * @apiErrorExample {Json} Error-response:
      *      HTTP/1.1 200 OK
      *      {
      *          "success": 0,
-     *          "error_message": "Business does not exist."
+     *          "err_code": "NoBusinessFound"
      *      }
      *
      */
     public function postCreateService(){
-        if(Business::where('business_id', '=', Input::get('business_id'))->exists()){
-            $service_id = Service::createBusinessService(Input::get('business_id'), Input::get('name'));
-            return json_encode(['service_id' => $service_id]);
-        }else{
-            return json_encode(['success' => 0, 'error_message' => 'Business does not exist.']);
-        }
+        return Service::createBusinessService(Input::get('business_id'), Input::get('name'));
     }
 
     /**
      * @api {put} /services/{service_id} Update Service
-     * @apiName Update Service
+     * @apiName UpdateService
      * @apiGroup Service
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage
@@ -66,6 +61,7 @@ class ServiceController extends Controller{
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission none
      *
+     * @apiParam {Number} service_id The id of the service to be updated.
      * @apiParam {String} name The name of the service to be created.
      *
      * @apiSuccess (200) {Number} success Returns <code>1</code> if the update is successful.
@@ -76,27 +72,22 @@ class ServiceController extends Controller{
      *      }
      *
      * @apiError (Error) {Number} success Returns <code>0</code> if the service update fails.
-     * @apiError (Error) {String} error_message Gives the reason for the service update failure.
+     * @apiError (Error) {String} err_code Gives the reason for the service update failure.
      * @apiErrorExample {Json} Error-response:
      *      HTTP/1.1 200 OK
      *      {
      *          "success": 0,
-     *          "error_message": "Service does not exist"
+     *          "err_code": "NoServiceFound"
      *      }
      *
      */
     public function putUpdateService($service_id){
-        if(Service::where('service_id', '=', $service_id)->exists()){
-            Service::updateServiceName($service_id, Input::get('name'));
-            return json_encode(['success' => 1]);
-        }else{
-            return json_encode(['success' => 0, 'error_message' => 'Service does not exist.']);
-        }
+        return Service::updateServiceName($service_id, Input::get('name'));
     }
 
     /**
      * @api {delete} /services/{service_id} Delete Service
-     * @apiName Delete Service
+     * @apiName DeleteService
      * @apiGroup Service
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage
@@ -106,6 +97,8 @@ class ServiceController extends Controller{
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission none
      *
+     * @apiParam {Number} service_id The id of the service to be updated.
+     *
      * @apiSuccess (200) {Number} success Returns <code>1</code> if the update is successful.
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK
@@ -114,21 +107,16 @@ class ServiceController extends Controller{
      *      }
      *
      * @apiError (Error) {Number} success Returns <code>0</code> if the service deletion fails.
-     * @apiError (Error) {String} error_message Gives the reason for the service deletion failure.
+     * @apiError (Error) {String} err_code Gives the reason for the service deletion failure.
      * @apiErrorExample {Json} Error-response:
      *      HTTP/1.1 200 OK
      *      {
      *          "success": 0,
-     *          "error_message": "Service does not exist"
+     *          "err_code": "NoServiceFound"
      *      }
      *
      */
     public function deleteRemoveService($service_id){
-        if(Service::where('service_id', '=', $service_id)->exists()){
-            Service::deleteService($service_id);
-            return json_encode(['success' => 1]);
-        }else{
-            return json_encode(['success' => 0, 'error_message' => 'Service does not exist.']);
-        }
+        return Service::deleteService($service_id);
     }
 }
