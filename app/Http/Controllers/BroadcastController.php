@@ -6,7 +6,6 @@ use App\Models\BroadcastSettings;
 use App\Models\Business;
 use App\Models\AdImages;
 use App\Models\Service;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 
 class BroadcastController extends Controller
@@ -187,7 +186,7 @@ class BroadcastController extends Controller
     }
 
     /**
-     * @api {put} broadcast/update/{business_id} Update Broadcast.
+     * @api {put} /broadcast/update/{business_id} Update Broadcast.
      * @apiName UpdateBroadcast
      * @apiGroup Broadcast
      * @apiVersion 1.0.0
