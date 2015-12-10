@@ -248,9 +248,11 @@ class Analytics extends Model
     {
         if ($user_id) {
             $results = Analytics::where('user_id', '=', $user_id)->get();
-        } else {
-            $results = Analytics::all();
         }
+        // we do not want to query everything!
+//        else {
+//            $results = Analytics::all();
+//        }
 
         foreach ($results as $index => $data) {
             $action = 'issued';
@@ -262,11 +264,12 @@ class Analytics extends Model
                 $action = 'dropped';
             }
 
-            try {
-                $user_data[$index][$action] = Business::name($data->business_id);
-                $user_data[$index]['user_id'] = $data->user_id;
-            } catch (Exception $e) {
+            $business = Business::getBusinessByBusinessId($data->business_id);
+            if (is_null($business)) {
                 $user_data[$index][$action] = 'Deleted Businesses';
+                $user_data[$index]['user_id'] = $data->user_id;
+            } else {
+                $user_data[$index][$action] = $business->name;
                 $user_data[$index]['user_id'] = $data->user_id;
             }
         }
