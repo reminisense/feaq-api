@@ -17,6 +17,18 @@ class Terminal extends Model
     protected $primaryKey = 'terminal_id';
     public $timestamps = false;
 
+    public static function createTerminal($service_id, $name){
+        $terminal = new Terminal();
+        $terminal->name = $name;
+        $terminal->service_id = $service_id;
+        $terminal->status = 1;
+        $terminal->box_rank = Terminal::generateBoxRank($service_id); // Added by PAG
+
+        $terminal->save();
+
+        return $terminal;
+    }
+
     /*
      * @author: CSD
      * @description: create terminal on business creation/setup
@@ -25,14 +37,7 @@ class Terminal extends Model
     public static function createBranchServiceTerminal($user_id, $service_id, $num){
         $terminals = [];
         for($i = 1; $i <= $num; $i++){
-            $terminal = new Terminal();
-            $terminal->name = "Terminal " . $i;
-            $terminal->service_id = $service_id;
-            $terminal->status = 1;
-            $terminal->box_rank = Terminal::generateBoxRank($service_id); // Added by PAG
-
-            $terminal->save();
-
+            $terminal = Terminal::createTerminal($service_id, "Terminal " . $i);
             $terminaluser = new TerminalUser();
             $terminaluser->user_id = $user_id;
             $terminaluser->terminal_id = $terminal->terminal_id;
@@ -44,6 +49,26 @@ class Terminal extends Model
         }
 
         return $terminals;
+    }
+
+    public static function createBusinessTerminal($business_id, $service_id, $name){
+        if($name == ''){return json_encode(['success' => 0, 'err_code' => 'MissingNameField']);}
+        if(!Business::where('business_id', '=', $business_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoBusinessFound']);}
+        if(!Service::where('service_id', '=', $service_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoServiceFound']);}
+        $service_exists = Service::join('branch', 'service.branch_id', '=', 'branch.branch_id')
+            ->join('business', 'branch.business_id', '=', 'business.business_id')
+            ->where('business.business_id', '=', $business_id)
+            ->where('service.service_id', '=', $service_id)
+            ->exists();
+        if(!$service_exists){return json_encode(['success' => 0, 'err_code' => 'ServiceNotInBusiness']);}
+
+        if (!Terminal::validateTerminalName($business_id, $name, 0)) {
+            return json_encode(['status' => 0, 'err_code' => 'TerminalNameExists']);
+        }
+
+        Terminal::createTerminal($service_id, $name);
+        $business = Business::getBusinessDetails($business_id);
+        return json_encode(['success' => 1, 'business' => $business]);
     }
 
     /*
@@ -99,34 +124,38 @@ class Terminal extends Model
     }
 
     public static function deleteTerminal($terminal_id){
+        if(!Terminal::where('terminal_id', '=', $terminal_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoTerminalFound']);}
+        if (TerminalTransaction::terminalActiveNumbers($terminal_id) != 0) {return json_encode(['status' => 0, 'err_code' => 'PendingNumbersExist']);}
+
+        $business_id = Business::getBusinessIdByTerminalId($terminal_id);
         TerminalUser::where('terminal_id', '=', $terminal_id)->delete();
         Terminal::where('terminal_id', '=', $terminal_id)->delete();
+        $business = Business::getBusinessDetails($business_id);
+        return json_encode(['success' => 1, 'business' => $business]);
+
     }
 
     public static function createBusinessNewTerminal($business_id, $name){
         $first_branch = Branch::where('business_id', '=', $business_id)->first();
         $first_service = Service::where('branch_id', '=', $first_branch->branch_id)->first();
-
-        $terminal = new Terminal();
-        $terminal->name = $name;
-        $terminal->service_id = $first_service->service_id;
-        $terminal->status = 1;
-        $terminal->box_rank = Terminal::generateBoxRank($first_service->service_id); // Added by PAG
-
-        $terminal->save();
+        return Terminal::createTerminal($first_service->service_id, $name);
     }
 
     // Added by PAG
+    // 12032015 Updated by ARA for multiple services implementation
     private static function generateBoxRank($service_id) {
-      $box_rank = array();
-      $res = Terminal::where('service_id', '=', $service_id)->select(array('box_rank'))->get();
-      foreach ($res as $count => $data) {
-        $box_rank[] = $data->box_rank;
-      }
-      if (!in_array('1', $box_rank)) return '1';
-      elseif (!in_array('2', $box_rank)) return '2';
-      elseif (!in_array('3', $box_rank)) return '3';
-      //return Terminal::where('service_id', '=', $service_id)->select(DB::raw('COUNT(*) AS rankcount'))->first()->rankcount + 1;
+        $box_rank = array();
+        $business_id = Business::getBusinessIdByServiceId($service_id);
+        $res = Terminal::join('service', 'terminal.service_id', '=', 'service.service_id')
+            ->join('branch', 'service.branch_id', '=', 'branch.branch_id')
+            ->join('business', 'branch.business_id', '=', 'business.business_id')
+            ->where('business.business_id', '=', $business_id)
+            ->select(array('box_rank'))->get();
+        foreach ($res as $count => $data) {
+            $box_rank[] = $data->box_rank;
+        }
+
+        for($rank = 1; in_array($rank, $box_rank); $rank++); return $rank;
     }
 
     public static function boxRank($terminal_id) {
@@ -134,11 +163,32 @@ class Terminal extends Model
     }
 
     public static function setName($terminal_id, $name) {
+        if($name == ''){return json_encode(['success' => 0, 'err_code' => 'MissingNameField']);}
+        if(!Terminal::where('terminal_id', '=', $terminal_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoTerminalFound']);}
+        $business_id = Business::getBusinessIdByTerminalId($terminal_id);
+        if (!Terminal::validateTerminalName($business_id, $name, $terminal_id)) {return json_encode(['success' => 0, 'err_code' => 'TerminalNameExists.']);}
         Terminal::where('terminal_id', '=', $terminal_id)->update(array('name' => $name));
+        return json_encode(['success' => 1]);
     }
 
-  public static function deleteTerminalsByServiceId($service_id) {
-    Terminal::where('service_id', '=', $service_id)->delete();
-  }
+    public static function deleteTerminalsByServiceId($service_id) {
+        Terminal::where('service_id', '=', $service_id)->delete();
+    }
+
+    public static function validateTerminalName($business_id, $input_terminal_name, $terminal_id){
+        $terminals = Terminal::getTerminalsByBusinessId($business_id);
+
+        foreach($terminals as $terminal){
+
+            /* JCA - string to lower case, remove spaces before and after, and removes whitepaces in between*/
+            $trimmed_input_terminal_name_lower = preg_replace('/\s+/', ' ', trim(strtolower($input_terminal_name)));
+            $trimmed_terminal_name_lower = preg_replace('/\s+/', ' ', trim(strtolower($terminal['name'])));
+
+            if($terminal['terminal_id'] != $terminal_id && $trimmed_terminal_name_lower == $trimmed_input_terminal_name_lower){
+                return false;
+            }
+        }
+        return true;
+    }
 
 }

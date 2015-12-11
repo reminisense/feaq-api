@@ -23,7 +23,6 @@ class Helper extends Model
             'ampm' => trim($arr[1]),
         ];
     }
-
     /**
      * gets timezone offset and converts it to php timezone string
      * @param $offset
@@ -41,7 +40,6 @@ class Helper extends Model
         }
         return false;
     }
-
     public static function timezoneOffsetToNameArray($offset)
     {
         $timezones = [];
@@ -55,12 +53,10 @@ class Helper extends Model
         }
         return $timezones;
     }
-
     public static function doubleZero($number)
     {
         return $number == 0 ? '00' : $number;
     }
-
     public static function changeBusinessTimeTimezone($date, $business_timezone, $browser_timezone)
     {
         $browser_timezone = $browser_timezone != null ? $browser_timezone : $business_timezone;
@@ -69,7 +65,6 @@ class Helper extends Model
         $datetime->setTimezone(new \DateTimeZone($browser_timezone));
         return $datetime->format('g:i A');
     }
-
     public static function millisecondsToHMSFormat($ms)
     {
         $second = $ms % 60;
@@ -79,7 +74,6 @@ class Helper extends Model
         $hour = $ms % 24;
         return Helper::formatTime($second, $minute, $hour);
     }
-
     public static function formatTime($second, $minute, $hour)
     {
         $time_string = '';
@@ -88,7 +82,6 @@ class Helper extends Model
         $time_string .= $second > 0 ? $second . ' second(s) ' : '';
         return $time_string;
     }
-
     /**
      * requires an array of arrays
      * ex. 'field' => array('conditional_operator', 'value')
@@ -118,5 +111,15 @@ class Helper extends Model
     {
         $d = DateTime::createFromFormat('Ymd', $date);
         return $d && $d->format('Ymd') == $date;
+    }
+
+    public static function mergeTime($hour, $min, $ampm)
+    {
+        return Helper::doubleZero($hour) . ':' . Helper::doubleZero($min) . ' ' . $ampm;
+    }
+
+    public static function userId(){
+        //@todo add function to get the user id based on the oauth function to be implemented
+        return 0;
     }
 }

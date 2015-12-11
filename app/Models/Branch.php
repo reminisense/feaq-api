@@ -48,12 +48,11 @@ class Branch extends Model
         return Branch::where('business_id', '=', $business_id)->get();
     }
 
-  public static function deleteBranchesByBusinessId($business_id){
-    return Branch::where('business_id', '=', $business_id)->delete();
-  }
+    public static function deleteBranchesByBusinessId($business_id){
+        return Branch::where('business_id', '=', $business_id)->delete();
+    }
 
     public static function getFirstBranchOfBusiness($business_id){
         return Branch::where('business_id', '=', $business_id)->first();
     }
-
 }

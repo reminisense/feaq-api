@@ -28,5 +28,21 @@ class User extends Model
         $temp_end_date = date("Y/m/d", $end_date);
         return User::where('registration_date', '>=', $temp_start_date)->where('registration_date', '<', $temp_end_date)->get();
     }
+    public static function checkFBUser($fb_id)
+    {
+        return User::where('fb_id', '=', $fb_id)->exists();
+    }
 
+    public static function getUserIdByFbId($fb_id)
+    {
+        return User::where('fb_id', '=', $fb_id)->select(array('user_id'))->first()->user_id;
+    }
+
+    public static function searchByEmail($email){
+        $user =  User::where('verified', '=', 1)
+            ->where('email', '=', $email )
+            ->select('user_id', 'first_name', 'last_name', 'email')
+            ->first();
+        return $user ? $user->toArray() : null;
+    }
 }

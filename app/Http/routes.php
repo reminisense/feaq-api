@@ -68,3 +68,34 @@ $app->post('admin/show-graph', 'AdminController@getProcessnumbers');
 // Layouts and Ads API
 $app->post('ads/upload/{business_id}', 'AdvertisementController@postUploadImage');
 $app->put('broadcast/update/{business_id}', 'BroadcastController@saveSettings');
+
+// RESTFUL services routes
+$app->post('services', 'ServiceController@postCreateService');
+
+$app->put('services/{id}', 'ServiceController@putUpdateService');
+
+$app->delete('services/{id}', 'ServiceController@deleteRemoveService');
+
+// RESTFUL terminals routes
+$app->post('terminals/user', 'TerminalController@postAddUser');
+
+$app->delete('terminals/user/{terminal_id}/{user_id}', 'TerminalController@deleteRemoveUser');
+
+$app->post('terminals', 'TerminalController@postCreateTerminal');
+
+$app->put('terminals/{id}', 'TerminalController@putUpdateTerminalName');
+
+$app->delete('terminals/{id}', 'TerminalController@deleteRemoveTerminal');
+
+//RESTFUL queue routes
+$app->get('queue/numbers/{terminal_id}', 'QueueController@getAllNumbers');
+
+$app->put('queue/serve', 'QueueController@putServeNumber');
+
+$app->put('queue/drop', 'QueueController@putDropNumber');
+
+$app->put('queue/call', 'QueueController@putCallNumber');
+
+$app->post('queue/insert-multiple', 'QueueController@postIssueMultiple');
+
+$app->post('queue/user/rating', 'QueueController@postUserRating');
