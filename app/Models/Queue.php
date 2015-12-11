@@ -148,9 +148,13 @@ class Queue extends Model{
 					);
 				}
 			}
-			usort($processed_numbers, array('ProcessQueue', 'sortProcessedNumbers'));
-			usort($called_numbers, array('ProcessQueue', 'sortCalledNumbers'));
-			$priority_numbers->last_number_given = $last_number_given;
+            usort($processed_numbers, function ($var1, $var2) {
+                return $var1['time_processed'] - $var2['time_processed'];
+            });
+            usort($called_numbers, function ($var1, $var2) {
+                return $var2['time_called'] - $var1['time_called'];
+            });
+            $priority_numbers->last_number_given = $last_number_given;
 			$priority_numbers->next_number = Queue::nextNumber($priority_numbers->last_number_given, QueueSettings::numberStart($service_id), QueueSettings::numberLimit($service_id));
 			$priority_numbers->current_number = $called_numbers ? $called_numbers[key($called_numbers)]['priority_number'] : 0;
 			$priority_numbers->number_limit = $number_limit;
