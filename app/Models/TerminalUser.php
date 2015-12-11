@@ -77,4 +77,9 @@ class TerminalUser extends Model{
     public static function getLatestLoginIdOfTerminal($terminal_id) {
         return DB::table('terminal_manager')->orderBy('login_id', 'desc')->select('login_id')->where('terminal_id', '=', $terminal_id)->first()->login_id;
     }
+
+  public static function deleteUserByTerminalId($terminal_id) {
+    TerminalUser::where('terminal_id', '=', $terminal_id)->delete();
+  }
+
 }
