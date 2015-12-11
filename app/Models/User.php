@@ -13,30 +13,24 @@ use Illuminate\Database\Eloquent\Model;
 class User extends Model
 {
 
-  protected $table = 'user';
-  protected $primaryKey = 'user_id';
-  public $timestamps = false;
+    protected $table = 'user';
+    protected $primaryKey = 'user_id';
+    public $timestamps = false;
 
-  public static function getUserByUserId($user_id){
-    return User::where('user_id', '=', $user_id)->get()->first();
-  }
-
-  public static function saveFBDetails($data)
+    public static function getUserByUserId($user_id)
     {
-        if (!User::checkFBUser($data['fb_id']))
-        {
-            User::insert($data);
-            //Notifier::sendSignupEmail($data['email'], $data['first_name'] . ' ' . $data['last_name']);
-        }
+        return User::where('user_id', '=', $user_id)->get()->first();
     }
 
-    public static function checkFBUser($fb_id)
+    public static function getUsersByRange($start_date, $end_date)
     {
-        return User::where('fb_id', '=', $fb_id)->exists();
+        $temp_start_date = date("Y/m/d", $start_date);
+        $temp_end_date = date("Y/m/d", $end_date);
+        return User::where('registration_date', '>=', $temp_start_date)->where('registration_date', '<', $temp_end_date)->get();
     }
 
-    public static function getUserIdByFbId($fb_id)
+    public static function getUsersByRangeYmd($start_date, $end_date)
     {
-        return User::where('fb_id', '=', $fb_id)->select(array('user_id'))->first()->user_id;
+        return User::where('registration_date', '>=', $start_date)->where('registration_date', '<', $end_date)->get();
     }
 }
