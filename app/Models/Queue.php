@@ -349,18 +349,17 @@ class Queue extends Model
     }
 
     public static function issueMultipleNumbers($data){
-        if($data->terminal_id && $data->service_id && $data->number_start && $data->range){
-            $terminal_id = QueueSettings::terminalSpecificIssue($data->service_id) ? $data->terminal_id : 0;
-            $next_number = Queue::nextNumber(Queue::lastNumberGiven($data->service_id), QueueSettings::numberStart($data->service_id), QueueSettings::numberLimit($data->service_id));
-            $queue_platform = $data->number_start == $next_number || $data->number_start == null ? 'web' : 'specific';
-            $number_start = $data->number_start == null ? $next_number : $data->number_start;
+        if(!($data->terminal_id && $data->service_id && $data->number_start && $data->range)){return json_encode(['error' => 'MissingParameters']);}
+        if(!Service::where('service_id', '=', $data->service_id)->exists()){return json_encode(['success' => 0, 'err_code' => 'NoServiceFound']);}
+        if(!Terminal::where('terminal_id', '=', $data->terminal_id)->exists()) {return json_encode(['success' => 0, 'err_code' => 'NoTerminalFound']);}
 
-            $result = Queue::issueMultiple($data->service_id, $number_start, $data->range, $data->date, $queue_platform, $terminal_id);
-            $result['success'] = 1;
-        }else{
-            $result['error'] = 'MissingParameters';
-        }
+        $terminal_id = QueueSettings::terminalSpecificIssue($data->service_id) ? $data->terminal_id : 0;
+        $next_number = Queue::nextNumber(Queue::lastNumberGiven($data->service_id), QueueSettings::numberStart($data->service_id), QueueSettings::numberLimit($data->service_id));
+        $queue_platform = $data->number_start == $next_number || $data->number_start == null ? 'web' : 'specific';
+        $number_start = $data->number_start == null ? $next_number : $data->number_start;
 
+        $result = Queue::issueMultiple($data->service_id, $number_start, $data->range, $data->date, $queue_platform, $terminal_id);
+        $result['success'] = 1;
         return json_encode($result);
     }
 

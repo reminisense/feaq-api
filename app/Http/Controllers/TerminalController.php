@@ -71,12 +71,53 @@ class TerminalController extends Controller{
      *
      * @apiSuccess (200) {Object[]} business.services The list of services of the business
      * @apiSuccess (200) {Object} business.services.service The details of the service
+     * @apiSuccess (200) {Number} business.services.service.service_id The id of the service
+     * @apiSuccess (200) {Number} business.services.service.branch_id The id of the branch where the service is located
+     * @apiSuccess (200) {Number} business.services.service.business_id The id of the business where the service is located
+     * @apiSuccess (200) {String} business.services.service.name The name of the service
+     * @apiSuccess (200) {Object[]} business.services.service.terminals The terminals of the service
+     * @apiSuccess (200) {Object} business.services.service.terminals.terminal The details of the terminal
+     * @apiSuccess (200) {Number} business.services.service.terminals.terminal.terminal_id The id of the terminal
+     * @apiSuccess (200) {String} business.services.service.terminals.terminal.name The name of the terminal
+     * @apiSuccess (200) {String} business.services.service.terminals.terminal.code The code assigned to the terminal
+     * @apiSuccess (200) {Number} business.services.service.terminals.terminal.service_id The id of the service where the terminal is located
+     * @apiSuccess (200) {Number} business.services.service.terminals.terminal.status The status of the terminal
+     * @apiSuccess (200) {String} business.services.service.terminals.terminal.time_created The date and time when the terminal was created
+     * @apiSuccess (200) {Number} business.services.service.terminals.terminal.box_rank The rank of the terminal which determines its box color in the broadcast page
+     * @apiSuccess (200) {Object[]} business.services.service.terminals.terminal.users The terminal users of the terminal
+     * @apiSuccess (200) {Object} business.services.service.terminals.terminal.users.user The details of the terminal user
+     * @apiSuccess (200) {Number} business.services.service.terminals.terminal.users.user.terminal_user_id The id of the terminal user in the terminal user table
+     * @apiSuccess (200) {Number} business.services.service.terminals.terminal.users.user.user_id The id of the user in the user table
+     * @apiSuccess (200) {Number} business.services.service.terminals.terminal.users.user.terminal_id The id of the terminal
+     * @apiSuccess (200) {Number} business.services.service.terminals.terminal.users.user.status The status of the terminal user
+     * @apiSuccess (200) {Number} business.services.service.terminals.terminal.users.user.date The date in seconds of when the terminal user was added
+     * @apiSuccess (200) {String} business.services.service.terminals.terminal.users.user.first_name The first name of the terminal user
+     * @apiSuccess (200) {String} business.services.service.terminals.terminal.users.user.last_name The last name of the terminal user
      *
      * @apiSuccess (200) {Object[]} business.terminals The list of terminals of the business
      * @apiSuccess (200) {Object} business.terminals.terminal The details of the terminal
+     * @apiSuccess (200) {Number} business.terminals.terminal.terminal_id The id of the terminal
+     * @apiSuccess (200) {String} business.terminals.terminal.name The name of the terminal
+     * @apiSuccess (200) {String} business.terminals.terminal.code The code assigned to the terminal
+     * @apiSuccess (200) {Number} business.terminals.terminal.service_id The id of the service where the terminal is located
+     * @apiSuccess (200) {Number} business.terminals.terminal.status The status of the terminal
+     * @apiSuccess (200) {String} business.terminals.terminal.time_created The date and time when the terminal was created
+     * @apiSuccess (200) {Number} business.terminals.terminal.box_rank The rank of the terminal which determines its box color in the broadcast page
+     * @apiSuccess (200) {Object[]} business.terminals.terminal.users The terminal users of the terminal
+     * @apiSuccess (200) {Object} business.terminals.terminal.users.user The details of the terminal user
+     * @apiSuccess (200) {Number} business.terminals.terminal.users.user.terminal_user_id The id of the terminal user in the terminal user table
+     * @apiSuccess (200) {Number} business.terminals.terminal.users.user.user_id The id of the user in the user table
+     * @apiSuccess (200) {Number} business.terminals.terminal.users.user.terminal_id The id of the terminal
+     * @apiSuccess (200) {Number} business.terminals.terminal.users.user.status The status of the terminal user
+     * @apiSuccess (200) {Number} business.terminals.terminal.users.user.date The date in seconds of when the terminal user was added
+     * @apiSuccess (200) {String} business.terminals.terminal.users.user.first_name The first name of the terminal user
+     * @apiSuccess (200) {String} business.terminals.terminal.users.user.last_name The last name of the terminal user
      *
      * @apiSuccess (200) {Object[]} business.allowed_businesses The list of businesses allowed to forward numbers to the queue
      * @apiSuccess (200) {Object} business.allowed_business.business The details of the allowed business
+     * @apiSuccess (200) {Object} business.allowed_business.business.business_id The id of the allowed business
+     * @apiSuccess (200) {Object} business.allowed_business.business.business_name The name of the allowed business
+     *
      *
      * @apiSuccessExample {Json} Success-Response:
      *      HTTP/1.1 200 OK
@@ -122,16 +163,65 @@ class TerminalController extends Controller{
      *                  "services":
      *                      [
      *                          {
+     *                              "service_id": 168,
+     *                              "branch_id": 168,
+     *                              "business_id": 168,
+     *                              "name": "Monsters Inc Service",
+     *                              "terminals":
+     *                                  [
+     *                                      {
+     *                                          "terminal_id": 462,
+     *                                          "name": "Monster Termina 1",
+     *                                          "code": "",
+     *                                          "service_id": 168,
+     *                                          "status": 1,
+     *                                          "time_created": "2015-12-03 04:32:10",
+     *                                          "box_rank": 1,
+     *                                          "users":
+     *                                              [
+     *                                                  {
+     *                                                      "terminal_user_id": 503,
+     *                                                      "user_id": 43,
+     *                                                      "terminal_id": 462,
+     *                                                      "status": 1,
+     *                                                      "date": 1449072000,
+     *                                                      "first_name": "Aunne Rouie",
+     *                                                      "last_name": Arzadon
+     *                                                  },
+     *                                              ]
+     *                                      }
+     *                                  ]
      *                          },
      *                      ],
      *                  "terminals":
      *                      [
      *                          {
-     *                          },
-     *                      ]
+     *                              "terminal_id": 462,
+     *                              "name": "Monster Termina 1",
+     *                              "code": "",
+     *                              "service_id": 168,
+     *                              "status": 1,
+     *                              "time_created": "2015-12-03 04:32:10",
+     *                              "box_rank": 1,
+     *                              "users":
+     *                                  [
+     *                                      {
+     *                                          "terminal_user_id": 503,
+     *                                          "user_id": 43,
+     *                                          "terminal_id": 462,
+     *                                          "status": 1,
+     *                                          "date": 1449072000,
+     *                                          "first_name": "Aunne Rouie",
+     *                                          "last_name": Arzadon
+     *                                      },
+     *                                  ]
+     *                          }
+     *                      ],
      *                  "allowed_businesses":
      *                      [
      *                          {
+     *                              "business_id": 1,
+     *                              "business_name": "Monsters Inc"
      *                          },
      *                      ]
      *              }
