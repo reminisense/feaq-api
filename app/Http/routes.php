@@ -63,4 +63,4 @@ $app->get('admin/watchdog/{user_id}/{keyword}/', 'WatchdogController@getUserdata
 $app->get('admin/features/{business_id}', 'AdminController@getBusinessFeatures');
 $app->post('admin/features/update/{business_id}', 'AdminController@postSaveFeatures');
 $app->get('admin/stats/{start_date}/{end_date}', 'AdminController@getBusinessnumbers');
-$app->post('admin/show-graph', 'AdminController@showGraph');
+$app->post('admin/show-graph', 'AdminController@getProcessnumbers');

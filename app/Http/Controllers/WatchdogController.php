@@ -86,7 +86,7 @@ class WatchdogController extends Controller
 //  }
 
     /**
-     * @api {post} /admin/watchdog/{user_id}/{keyword} Retrieve watchdog data.
+     * @api {get} /admin/watchdog/{user_id}/{keyword} Retrieve watchdog data.
      * @apiName RetrieveWatchdogData
      * @apiGroup Admin
      * @apiVersion 1.0.0
