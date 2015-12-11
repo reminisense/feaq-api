@@ -110,15 +110,15 @@ class BusinessController extends Controller
      * @apiGroup Business
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
-     *     https://api.featherq.com/analytics/business/1/20151101/20151207
+     *     https://api.featherq.com/analytics/business/1/1449590400/1449676800
      * @apiDescription Retrieve business analytics information
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
      *
      * @apiParam {Number} business_id Unique ID of business to retrieve.
-     * @apiParam {Date} date_start Start date in which to query businesses. Format should be Ymd.
-     * @apiParam {Date} end_date End date in which to query businesses. Format should be Ymd.
+     * @apiParam {Date} date_start Start date in which to query businesses. Format should be Unix timestamp.
+     * @apiParam {Date} end_date End date in which to query businesses. Format should be Unix timestamp.
      *
      * @apiSuccess (200) {Number} successProcess success/fail flag.
      * @apiSuccess (200) {Number} total_numbers_issued Business count.
@@ -161,15 +161,14 @@ class BusinessController extends Controller
             ));
         }
 
-        if (is_null($start_date) || is_null($end_date) || !Helper::is_Ymd($start_date) || !Helper::is_Ymd($end_date)) {
+        if (is_null($start_date) || is_null($end_date)) {
             return json_encode(array(
                 'success' => 0,
                 'err_code' => 'InvalidInput'
             ));
-        }
-        $temp_start_date = date_create_from_format('Ymd', $start_date);
-        $temp_end_date = date_create_from_format('Ymd', $end_date);
-        $analytics = Analytics::getBusinessAnalytics($business_id, $temp_start_date->getTimestamp(), $temp_end_date->getTimestamp());
+        };
+
+        $analytics = Analytics::getBusinessAnalytics($business_id, $start_date, $end_date);
         return json_encode($analytics);
     }
 }
