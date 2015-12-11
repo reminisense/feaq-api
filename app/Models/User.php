@@ -29,8 +29,4 @@ class User extends Model
         return User::where('registration_date', '>=', $temp_start_date)->where('registration_date', '<', $temp_end_date)->get();
     }
 
-    public static function getUsersByRangeYmd($start_date, $end_date)
-    {
-        return User::where('registration_date', '>=', $start_date)->where('registration_date', '<', $end_date)->get();
-    }
 }

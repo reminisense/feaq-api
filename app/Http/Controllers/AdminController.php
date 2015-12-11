@@ -25,14 +25,14 @@ class AdminController extends Controller
      * @apiGroup Admin
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
-     *     https://api.featherq.com/admin/stats/20150101/20150130
+     *     https://api.featherq.com/admin/stats/1449590400/1449676800
      * @apiDescription Retrieve business information
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
      *
-     * @apiParam {Date} date_start Start date in which to query businesses. Format should be <code>Ymd</code>.
-     * @apiParam {Date} end_date End date in which to query businesses. Format should be <code>Ymd</code>.
+     * @apiParam {Date} date_start Start date in which to query businesses. Format should be Unix timestamp.
+     * @apiParam {Date} end_date End date in which to query businesses. Format should be Unix timestamp.
      *
      * @apiSuccess (200) {Number} success Process success flag.
      * @apiSuccess (200) {Number} business_count Business count.
@@ -103,7 +103,7 @@ class AdminController extends Controller
     {
         // TODO check permissions of API user, add authentication here.
         if (true) {
-            if (is_null($start_date) || is_null($end_date) || !Helper::is_Ymd($start_date) || !Helper::is_Ymd($end_date)) {
+            if (is_null($start_date) || is_null($end_date)) {
                 return json_encode(array(
                     'success' => 0,
                     'err_code' => 'InvalidInput'
@@ -114,9 +114,9 @@ class AdminController extends Controller
             $users_count = 0;
             $users_information = [];
             $businesses_information = [];
-            $end_date_1 = date('Ymd', strtotime($end_date . "+1 days"));
+            $temp_date = $end_date + 86400;
 
-            $businesses = Business::getBusinessByRangeYmd($start_date, $end_date_1);
+            $businesses = Business::getBusinessByRange($start_date, $temp_date);
             if ($businesses) {
                 $businesses_count = count($businesses);
                 for ($i = 0; $i < $businesses_count; $i++) {
@@ -140,7 +140,7 @@ class AdminController extends Controller
                 }
             }
 
-            $users = User::getUsersByRangeYmd($start_date, $end_date);
+            $users = User::getUsersByRange($start_date, $end_date);
             if ($users) {
                 $users_count = count($users);
                 for ($i = 0; $i < $users_count; $i++) {
@@ -156,10 +156,10 @@ class AdminController extends Controller
             }
 
             $business_numbers = [
-                'issued_numbers' => Analytics::countBusinessNumbersYmd($start_date, $end_date, 0),
-                'called_numbers' => Analytics::countBusinessNumbersYmd($start_date, $end_date, 1),
-                'served_numbers' => Analytics::countBusinessNumbersYmd($start_date, $end_date, 2),
-                'dropped_numbers' => Analytics::countBusinessNumbersYmd($start_date, $end_date, 3)
+                'issued_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 0),
+                'called_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 1),
+                'served_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 2),
+                'dropped_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 3)
             ];
 
 

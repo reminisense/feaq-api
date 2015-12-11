@@ -277,15 +277,6 @@ class Analytics extends Model
         return $user_data;
     }
 
-    public static function countBusinessNumbersYmd($start_date, $end_date, $action)
-    {
-        $temp_start_date = date_create_from_format('Ymd', $start_date);
-        $temp_end_date = date_create_from_format('Ymd', $end_date);
-        $sd_ts = $temp_start_date->getTimestamp();
-        $ed_ts = $temp_end_date->getTimestamp();
-        return Analytics::where('date', '>=', $sd_ts)->where('date', '<=', $ed_ts)->where('action', '=', $action)->count();
-    }
-
     public static function countBusinessNumbers($start_date, $end_date, $action)
     {
 
