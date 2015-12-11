@@ -285,55 +285,55 @@ class BroadcastController extends Controller
     private function boxObjectCreator($data, $num_boxes)
     {
         if ($num_boxes >= '2') {
-            $data->box2 = new stdClass();
+            $data->box2 = new \stdClass();
             $data->box2->number = '';
             $data->box2->terminal = '';
             $data->box2->rank = '';
         }
         if ($num_boxes >= '3') {
-            $data->box3 = new stdClass();
+            $data->box3 = new \stdClass();
             $data->box3->number = '';
             $data->box3->terminal = '';
             $data->box3->rank = '';
         }
         if ($num_boxes >= '4') {
-            $data->box4 = new stdClass();
+            $data->box4 = new \stdClass();
             $data->box4->number = '';
             $data->box4->terminal = '';
             $data->box4->rank = '';
         }
         if ($num_boxes >= '5') {
-            $data->box5 = new stdClass();
+            $data->box5 = new \stdClass();
             $data->box5->number = '';
             $data->box5->terminal = '';
             $data->box5->rank = '';
         }
         if ($num_boxes >= '6') {
-            $data->box6 = new stdClass();
+            $data->box6 = new \stdClass();
             $data->box6->number = '';
             $data->box6->terminal = '';
             $data->box6->rank = '';
         }
         if ($num_boxes >= '7') {
-            $data->box7 = new stdClass();
+            $data->box7 = new \stdClass();
             $data->box7->number = '';
             $data->box7->terminal = '';
             $data->box7->rank = '';
         }
         if ($num_boxes >= '8') {
-            $data->box8 = new stdClass();
+            $data->box8 = new \stdClass();
             $data->box8->number = '';
             $data->box8->terminal = '';
             $data->box8->rank = '';
         }
         if ($num_boxes >= '9') {
-            $data->box9 = new stdClass();
+            $data->box9 = new \stdClass();
             $data->box9->number = '';
             $data->box9->terminal = '';
             $data->box9->rank = '';
         }
         if ($num_boxes == '10') {
-            $data->box10 = new stdClass();
+            $data->box10 = new \stdClass();
             $data->box10->number = '';
             $data->box10->terminal = '';
             $data->box10->rank = '';
