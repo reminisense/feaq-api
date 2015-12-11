@@ -59,8 +59,12 @@ $app->put('user/update', 'UserController@updateUser');
 $app->get('admin/list', 'AdminController@getAdmins');
 $app->post('admin/add/{email}', 'AdminController@addAdmin');
 $app->delete('admin/delete/{email}', 'AdminController@removeAdmin');
-$app->get('admin/watchdog/{user_id}/{keyword}/', 'WatchdogController@getUserdata');
+$app->get('admin/watchdog/{keyword}', 'AdminController@keyword');
 $app->get('admin/features/{business_id}', 'AdminController@getBusinessFeatures');
 $app->post('admin/features/update/{business_id}', 'AdminController@postSaveFeatures');
 $app->get('admin/stats/{start_date}/{end_date}', 'AdminController@getBusinessnumbers');
-$app->post('admin/show-graph', 'AdminController@getProcessnumbers');
+$app->post('admin/show-graph', 'AdminController@showGraph');
+
+// Layouts and Ads API
+$app->post('ads/upload/{business_id}', 'AdvertisementController@postUploadImage');
+$app->put('broadcast/update/{business_id}', 'BroadcastController@saveSettings');

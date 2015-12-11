@@ -380,7 +380,7 @@ class AdminController extends Controller
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
      *
-     * @apiParam {String} business_id Unique ID of business to add this feature to.
+     * @apiParam {Number} business_id Unique ID of business to add this feature to.
      * @apiParam {Object} data JSON object to be serialized.
      * @apiParam {Boolean} data.allow_sms Allow SMS flag.
      * @apiParam {Boolean} data.queue_forwarding Queue forwarding flag.
@@ -442,7 +442,7 @@ class AdminController extends Controller
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
      *
-     * @apiParam {String} business_id Unique ID of business to retrieve.
+     * @apiParam {Number} business_id Unique ID of business to retrieve.
      *
      * @apiSuccess (200) {Number} success Process success flag.
      * @apiSuccess (200) {Object} features Business features. This object should be serialized.
