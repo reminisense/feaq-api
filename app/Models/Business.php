@@ -108,6 +108,11 @@ class Business extends Model
             ->toArray();
     }
 
+    public static function fetchBusinessDetails($business_id)
+    {
+        return Business::where('business_id', '=', $business_id)->get()->first();
+    }
+    
     public static function getBusinessDetails($business_id)
     {
         $business = Business::where('business_id', '=', $business_id)->get()->first();
@@ -340,17 +345,17 @@ class Business extends Model
             ->get();
     }
 
-    public static function businessExistsByRawCode($raw_code = '')
-    {
+    public static function businessExistsByBusinessId($business_id) {
+        return Business::where('business_id', '=', $business_id)->exists();
+    }
+
+    public static function businessExistsByRawCode($raw_code = '') {
         return Business::where('raw_code', '=', $raw_code)->exists();
     }
 
     public static function deleteBusinessByBusinessId($business_id)
     {
         Business::where('business_id', '=', $business_id)->delete();
-
-        // PAG delete also the json file
-        unlink(public_path() . '/json/' . $business_id . '.json');
     }
 
     /*
@@ -686,9 +691,8 @@ class Business extends Model
      * @param $business_id
      * @return mixed
      */
-    public static function getForwardingAllowedBusinesses($business_id)
-    {
-        return DB::table('queue_forward_permissions')
+    public static function getForwardingAllowedBusinesses($business_id){
+        return \DB::table('queue_forward_permissions')
             ->where('queue_forward_permissions.business_id', '=', $business_id)
             ->join('business', 'business.business_id', '=', 'queue_forward_permissions.forwarder_id')
             ->select('business.business_id', 'business.name')

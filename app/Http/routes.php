@@ -23,11 +23,13 @@ $app->get('advertisement/{business_id}', 'AdvertisementController@getImages');
 
 // Queue API routes
 $app->post('queue/insert-specific', 'QueueController@postInsertSpecific');
+$app->post('queue/insert-number', 'QueueController@insertSpecific');
 
 // User Profile API routes
 $app->get('user/{user_id}', 'UserController@fetchProfile');
-
+$app->post('user/register', 'AuthenticationController@register');
 $app->get('branch', 'BranchController@getTest');
+$app->put('user/update', 'UserController@updateUser');
 
 //Authentication routes
 $app->post('user/register', 'AuthenticationController@register');
@@ -36,11 +38,11 @@ $app->post('login', 'AuthenticationController@login');
 
 $app->get('logout', 'AuthenticationController@logout');
 
-//Dashboard routes
+//Business API routes
 $app->get('business/search-suggest/{keyword}', 'BusinessController@searchSuggest');
 
 $app->get('business/search', 'BusinessController@search');
-
+$app->get('business/{business_id}', 'BusinessController@getDetails');
 //Broadcast routes
 
 $app->get('advertisements/{business_id}', 'AdvertisementController@advertisements');
@@ -98,4 +100,5 @@ $app->put('queue/call', 'QueueController@putCallNumber');
 
 $app->post('queue/insert-multiple', 'QueueController@postIssueMultiple');
 
-$app->post('queue/user/rating', 'QueueController@postUserRating');
+$app->post('queue/user/rating', 'QueueController@postUserRating');$app->delete('business/delete', 'BusinessController@deleteRecord');
+$app->put('business/update', 'BusinessController@putUpdate');
