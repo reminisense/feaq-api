@@ -501,8 +501,8 @@ class AdminController extends Controller
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
      *
-     * @apiParam {String} start_date Unique ID of business to retrieve.
-     * @apiParam {String} end_date Unique ID of business to retrieve.
+     * @apiParam {String} start_date Unique ID of business to retrieve. Format should be Unix timestamp.
+     * @apiParam {String} end_date Unique ID of business to retrieve. Format should be Unix timestamp.
      * @apiParam {String} mode The mode of retrieval. <code>business, country, industry</code>
      * @apiParam {String} value The value corresponding to the mode.
      *
@@ -546,18 +546,15 @@ class AdminController extends Controller
         // TODO check permissions of API user, add authentication here.
         if (true) {
 
-            if (is_null($start_date) || is_null($end_date) || !Helper::is_Ymd($start_date) || !Helper::is_Ymd($end_date)) {
+            $temp_start_date = $start_date;
+            $temp_end_date = $end_date + 86400;
+
+            if (is_null($start_date) || is_null($end_date)) {
                 return json_encode(array(
                     'success' => 0,
                     'err_code' => 'InvalidInput'
                 ));
             }
-
-            $sd = strtotime($start_date);
-            $ed = strtotime($end_date);
-            // FIXME: we adjust the hours because timezone stored in database are in GMT+8
-            $temp_start_date = mktime(-8, 0, 0, date('m', $sd), date('d', $sd), date('Y', $sd));
-            $temp_end_date = mktime(-8, 0, 0, date('m', $ed), date('d', $ed), date('Y', $ed)) + 86400;
 
             if ($mode == "business") {
 
