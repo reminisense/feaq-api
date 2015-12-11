@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AdImages;
-use Illuminate\Support\Facades\Input;
+use App\Models\Business;
 
 class AdvertisementController extends Controller
 {
