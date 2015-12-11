@@ -25,14 +25,14 @@ class AdminController extends Controller
      * @apiGroup Admin
      * @apiVersion 1.0.0
      * @apiExample {js} Example Usage:
-     *     https://api.featherq.com/admin/stats/20150101/20150130
+     *     https://api.featherq.com/admin/stats/1449590400/1449676800
      * @apiDescription Retrieve business information
      *
      * @apiHeader {String} access-key The unique access key sent by the client.
      * @apiPermission Authenticated Admin
      *
-     * @apiParam {Date} date_start Start date in which to query businesses. Format should be <code>Ymd</code>.
-     * @apiParam {Date} end_date End date in which to query businesses. Format should be <code>Ymd</code>.
+     * @apiParam {Date} date_start Start date in which to query businesses. Format should be Unix timestamp.
+     * @apiParam {Date} end_date End date in which to query businesses. Format should be Unix timestamp.
      *
      * @apiSuccess (200) {Number} success Process success flag.
      * @apiSuccess (200) {Number} business_count Business count.
@@ -103,7 +103,7 @@ class AdminController extends Controller
     {
         // TODO check permissions of API user, add authentication here.
         if (true) {
-            if (is_null($start_date) || is_null($end_date) || !Helper::is_Ymd($start_date) || !Helper::is_Ymd($end_date)) {
+            if (is_null($start_date) || is_null($end_date)) {
                 return json_encode(array(
                     'success' => 0,
                     'err_code' => 'InvalidInput'
@@ -114,9 +114,9 @@ class AdminController extends Controller
             $users_count = 0;
             $users_information = [];
             $businesses_information = [];
-            $end_date_1 = date('Ymd', strtotime($end_date . "+1 days"));
+            $temp_date = $end_date + 86400;
 
-            $businesses = Business::getBusinessByRangeYmd($start_date, $end_date_1);
+            $businesses = Business::getBusinessByRange($start_date, $temp_date);
             if ($businesses) {
                 $businesses_count = count($businesses);
                 for ($i = 0; $i < $businesses_count; $i++) {
@@ -140,7 +140,7 @@ class AdminController extends Controller
                 }
             }
 
-            $users = User::getUsersByRangeYmd($start_date, $end_date);
+            $users = User::getUsersByRange($start_date, $end_date);
             if ($users) {
                 $users_count = count($users);
                 for ($i = 0; $i < $users_count; $i++) {
@@ -156,10 +156,10 @@ class AdminController extends Controller
             }
 
             $business_numbers = [
-                'issued_numbers' => Analytics::countBusinessNumbersYmd($start_date, $end_date, 0),
-                'called_numbers' => Analytics::countBusinessNumbersYmd($start_date, $end_date, 1),
-                'served_numbers' => Analytics::countBusinessNumbersYmd($start_date, $end_date, 2),
-                'dropped_numbers' => Analytics::countBusinessNumbersYmd($start_date, $end_date, 3)
+                'issued_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 0),
+                'called_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 1),
+                'served_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 2),
+                'dropped_numbers' => Analytics::countBusinessNumbers($start_date, $end_date, 3)
             ];
 
 
@@ -489,4 +489,198 @@ class AdminController extends Controller
         }
     }
 
+    /**
+     * @api {post} /admin/show-graph Retrieve process information.
+     * @apiName RetrieveProcessInformation/ShowGraph
+     * @apiGroup Admin
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/admin/show-graph
+     * @apiDescription Retrieve process information. Originally ShowGraph function.
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Authenticated Admin
+     *
+     * @apiParam {String} start_date Unique ID of business to retrieve. Format should be Unix timestamp.
+     * @apiParam {String} end_date Unique ID of business to retrieve. Format should be Unix timestamp.
+     * @apiParam {String} mode The mode of retrieval. <code>business, country, industry</code>
+     * @apiParam {String} value The value corresponding to the mode.
+     *
+     * @apiSuccess (200) {Number} success Process success flag.
+     * @apiSuccess (200) {Number} issued_numbers Issued numbers count.
+     * @apiSuccess (200) {Number} called_numbers Called numbers count.
+     * @apiSuccess (200) {Number} served_numbers Served numbers count.
+     * @apiSuccess (200) {Number} dropped_numbers Dropped numbers count.
+     * @apiSuccess (200) {Number} issued_numbers_data Total issued.
+     *
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *      {
+     *          "success": 1,
+     *          "issued_numbers": 1,
+     *          "called_numbers": 2,
+     *          "served_numbers": 3,
+     *          "dropped_numbers": 4,
+     *          "issued_numbers_data": 5,
+     *      }
+     *
+     * @apiError (Error) {Number} success Process fail flag.
+     * @apiError (Error) {String} err_code UnauthorizedUser User does not have admin rights.
+     * @apiError (Error) {String} err_code InvalidInput Invalid input format.
+     * @apiError (Error) {String} err_code UnknownMode Unknown mode given.
+     *
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "success": 0,
+     *       "err_code": "UnauthorizedUser"
+     *     }
+     */
+    public function getProcessnumbers()
+    {
+        $start_date = Input::get('start_date');
+        $end_date = Input::get('end_date');
+        $mode = Input::get('mode');
+        $value = Input::get('value');
+
+        // TODO check permissions of API user, add authentication here.
+        if (true) {
+
+            $temp_start_date = $start_date;
+            $temp_end_date = $end_date + 86400;
+
+            if (is_null($start_date) || is_null($end_date)) {
+                return json_encode(array(
+                    'success' => 0,
+                    'err_code' => 'InvalidInput'
+                ));
+            }
+
+            if ($mode == "business") {
+
+                $issued_numbers = [];
+                $called_numbers = [];
+                $served_numbers = [];
+                $dropped_numbers = [];
+                $issued_data_numbers = [];
+
+                $business = Business::getBusinessIdByName($value);
+                while ($temp_start_date < $temp_end_date) {
+
+                    $next_day = $temp_start_date + 86400;
+
+                    for ($i = 0; $i < count($business); $i++) {
+
+
+                        $issued_count = Analytics::countNumbersByBusiness($business[$i]->business_id, $temp_start_date, 0);
+                        $called_count = Analytics::countNumbersByBusiness($business[$i]->business_id, $temp_start_date, 1);
+                        $served_count = Analytics::countNumbersByBusiness($business[$i]->business_id, $temp_start_date, 2);
+                        $dropped_count = Analytics::countNumbersByBusiness($business[$i]->business_id, $temp_start_date, 3);
+                        $issued_data_count = Analytics::countNumbersWithData($business[$i]->business_id, $temp_start_date);
+
+                        array_push($issued_numbers, $issued_count);
+                        array_push($called_numbers, $called_count);
+                        array_push($served_numbers, $served_count);
+                        array_push($dropped_numbers, $dropped_count);
+                        array_push($issued_data_numbers, $issued_data_count);
+
+                    }
+
+                    $temp_start_date = $next_day;
+                }
+
+                return json_encode([
+                    'success' => 1,
+                    'issued_numbers' => $issued_numbers,
+                    'called_numbers' => $called_numbers,
+                    'served_numbers' => $served_numbers,
+                    'dropped_numbers' => $dropped_numbers,
+                    'issued_numbers_data' => $issued_data_numbers
+                ]);
+
+            } else if ($mode == "industry") {
+
+                $issued_numbers = [];
+                $called_numbers = [];
+                $served_numbers = [];
+                $dropped_numbers = [];
+                $issued_data_numbers = [];
+
+                while ($temp_start_date < $temp_end_date) {
+
+                    $next_day = $temp_start_date + 86400;
+
+                    $issued_count = Analytics::countNumbersByIndustry($value, $temp_start_date, 0);
+                    $called_count = Analytics::countNumbersByIndustry($value, $temp_start_date, 1);
+                    $served_count = Analytics::countNumbersByIndustry($value, $temp_start_date, 2);
+                    $dropped_count = Analytics::countNumbersByIndustry($value, $temp_start_date, 3);
+                    $issued_data_count = Analytics::countIndustryNumbersWithData($value, $temp_start_date);
+
+                    array_push($issued_numbers, $issued_count);
+                    array_push($called_numbers, $called_count);
+                    array_push($served_numbers, $served_count);
+                    array_push($dropped_numbers, $dropped_count);
+                    array_push($issued_data_numbers, $issued_data_count);
+                    $temp_start_date = $next_day;
+                }
+
+                return json_encode([
+                    'success' => 1,
+                    'issued_numbers' => $issued_numbers,
+                    'called_numbers' => $called_numbers,
+                    'served_numbers' => $served_numbers,
+                    'dropped_numbers' => $dropped_numbers,
+                    'issued_numbers_data' => $issued_data_numbers
+                ]);
+
+            } else if ($mode == "country") {
+
+                $issued_numbers = [];
+                $called_numbers = [];
+                $served_numbers = [];
+                $dropped_numbers = [];
+                $issued_data_numbers = [];
+
+                while ($temp_start_date < $temp_end_date) {
+
+                    $next_day = $temp_start_date + 86400;
+
+                    $issued_count = Analytics::countNumbersByCountry($value, $temp_start_date, 0);
+                    $called_count = Analytics::countNumbersByCountry($value, $temp_start_date, 1);
+                    $served_count = Analytics::countNumbersByCountry($value, $temp_start_date, 2);
+                    $dropped_count = Analytics::countNumbersByCountry($value, $temp_start_date, 3);
+                    $issued_data_count = Analytics::countCountryNumbersWithData($value, $temp_start_date);
+
+                    array_push($issued_numbers, $issued_count);
+                    array_push($called_numbers, $called_count);
+                    array_push($served_numbers, $served_count);
+                    array_push($dropped_numbers, $dropped_count);
+                    array_push($issued_data_numbers, $issued_data_count);
+
+                    $temp_start_date = $next_day;
+                }
+
+                return json_encode([
+                    'success' => 1,
+                    'issued_numbers' => $issued_numbers,
+                    'called_numbers' => $called_numbers,
+                    'served_numbers' => $served_numbers,
+                    'dropped_numbers' => $dropped_numbers,
+                    'issued_numbers_data' => $issued_data_numbers
+                ]);
+            } else {
+                return json_encode([
+                    'success' => 0,
+                    'err_code' => 'UnknownMode'
+                ]);
+            }
+
+
+        } else {
+            return json_encode(array(
+                'success' => 0,
+                'err_code' => 'UnauthorizedUser'
+            ));
+        }
+    }
 }

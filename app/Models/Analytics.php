@@ -9,6 +9,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Analytics extends Model
 {
@@ -248,9 +249,11 @@ class Analytics extends Model
     {
         if ($user_id) {
             $results = Analytics::where('user_id', '=', $user_id)->get();
-        } else {
-            $results = Analytics::all();
         }
+        // we do not want to query everything!
+//        else {
+//            $results = Analytics::all();
+//        }
 
         foreach ($results as $index => $data) {
             $action = 'issued';
@@ -262,25 +265,16 @@ class Analytics extends Model
                 $action = 'dropped';
             }
 
-            try {
-                $user_data[$index][$action] = Business::name($data->business_id);
-                $user_data[$index]['user_id'] = $data->user_id;
-            } catch (Exception $e) {
+            $business = Business::getBusinessByBusinessId($data->business_id);
+            if (is_null($business)) {
                 $user_data[$index][$action] = 'Deleted Businesses';
+                $user_data[$index]['user_id'] = $data->user_id;
+            } else {
+                $user_data[$index][$action] = $business->name;
                 $user_data[$index]['user_id'] = $data->user_id;
             }
         }
         return $user_data;
-    }
-
-    public static function countBusinessNumbersYmd($start_date, $end_date, $action)
-    {
-        $temp_start_date = date_create_from_format('Ymd', $start_date);
-        $temp_end_date = date_create_from_format('Ymd', $end_date);
-        $sd_ts = $temp_start_date->getTimestamp();
-        $ed_ts = $temp_end_date->getTimestamp();
-
-        return Analytics::where('date', '>=', $sd_ts)->where('date', '<=', $ed_ts)->where('action', '=', $action)->count();
     }
 
     public static function countBusinessNumbers($start_date, $end_date, $action)
@@ -292,42 +286,39 @@ class Analytics extends Model
         return Analytics::where('date', '>=', $temp_start_date)->where('date', '<=', $temp_end_date)->where('action', '=', $action)->count();
     }
 
+
     public static function countNumbersByBusiness($business_id, $temp_start_date, $action)
     {
         return Analytics::where('business_id', '=', $business_id)->where('date', '=', $temp_start_date)->where('action', '=', $action)->count();
     }
 
-    public static function countIndustryNumbersWithData($business_id, $temp_start_date)
+    public static function countIndustryNumbersWithData($industry, $temp_start_date)
     {
-        $count = [];
 
-        for ($i = 0; $i < count($business_id); $i++) {
-            $transaction_number_array = Analytics::where('business_id', '=', $business_id[$i]->business_id)->where('date', '=', $temp_start_date)->where('action', '=', 0)->lists('transaction_number');
-            for ($i = 0; $i < count($transaction_number_array); $i++) {
-                $temp_data = DB::table('priority_queue')->where('transaction_number', '=', $transaction_number_array[$i])->get();
-                if ($temp_data[0]->name || $temp_data[0]->email || $temp_data[0]->phone) {
-                    array_push($count, 1);
-                }
-            }
-        }
-        return array_sum($count);
+        return DB::table('queue_analytics')
+            ->leftJoin('business', 'queue_analytics.business_id', '=', 'business.business_id')
+            ->leftJoin('priority_queue', 'queue_analytics.transaction_number', '=', 'priority_queue.transaction_number')
+            ->where('business.industry', '=', $industry)
+            ->where('queue_analytics.date', '=', $temp_start_date)
+            ->whereNotNull('priority_queue.name')
+            ->whereNotNull('priority_queue.email')
+            ->whereNotNull('priority_queue.phone')
+            ->count();
+
     }
 
-    public static function countCountryNumbersWithData($business_id, $temp_start_date)
+    public static function countCountryNumbersWithData($country, $temp_start_date)
     {
 
-        $count = [];
-
-        for ($i = 0; $i < count($business_id); $i++) {
-            $transaction_number_array = Analytics::where('business_id', '=', $business_id[$i]->business_id)->where('date', '=', $temp_start_date)->where('action', '=', 0)->lists('transaction_number');
-            for ($i = 0; $i < count($transaction_number_array); $i++) {
-                $temp_data = DB::table('priority_queue')->where('transaction_number', '=', $transaction_number_array[$i])->get();
-                if ($temp_data[0]->name || $temp_data[0]->email || $temp_data[0]->phone) {
-                    array_push($count, 1);
-                }
-            }
-        }
-        return array_sum($count);
+        return DB::table('queue_analytics')
+            ->leftJoin('business', 'queue_analytics.business_id', '=', 'business.business_id')
+            ->leftJoin('priority_queue', 'queue_analytics.transaction_number', '=', 'priority_queue.transaction_number')
+            ->where('business.local_address', 'LIKE', '%' . $country . '%')
+            ->where('queue_analytics.date', '=', $temp_start_date)
+            ->whereNotNull('priority_queue.name')
+            ->whereNotNull('priority_queue.email')
+            ->whereNotNull('priority_queue.phone')
+            ->count();
     }
 
     public static function countNumbersWithData($business_id, $temp_start_date)
@@ -346,31 +337,26 @@ class Analytics extends Model
         return array_sum($count);
     }
 
-    public static function countNumbersByIndustry($business_id, $temp_start_date, $action)
+    public static function countNumbersByIndustry($industry, $temp_start_date, $action)
     {
 
-        $count = [];
+//        select a.* from queue_analytics a left join business b on a.business_id = b.business_id where b.industry = 'Air Services'
+        return DB::table('queue_analytics')->leftJoin('business', 'queue_analytics.business_id', '=', 'business.business_id')
+            ->select('queue_analytics.*')
+            ->where('business.industry', '=', $industry)
+            ->where('queue_analytics.date', '=', $temp_start_date)
+            ->where('queue_analytics.action', '=', $action)->count();
 
-        for ($i = 0; $i < count($business_id); $i++) {
-            $temp_count = Analytics::where('business_id', '=', $business_id[$i]->business_id)->where('date', '=', $temp_start_date)->where('action', '=', $action)->count();
-            array_push($count, $temp_count);
-        }
-
-        return array_sum($count);
     }
 
-    public static function countNumbersByCountry($business_id, $temp_start_date, $action)
+    public static function countNumbersByCountry($country, $temp_start_date, $action)
     {
 
-        $count = [];
-
-        for ($i = 0; $i < count($business_id); $i++) {
-
-            $temp_count = Analytics::where('business_id', '=', $business_id[$i]->business_id)->where('date', '=', $temp_start_date)->where('action', '=', $action)->count();
-            array_push($count, $temp_count);
-        }
-
-        return array_sum($count);
+        return DB::table('queue_analytics')->leftJoin('business', 'queue_analytics.business_id', '=', 'business.business_id')
+            ->select('queue_analytics.*')
+            ->where('business.local_address', 'LIKE', '%' . $country . '%')
+            ->where('queue_analytics.date', '=', $temp_start_date)
+            ->where('queue_analytics.action', '=', $action)->count();
     }
 
 }
