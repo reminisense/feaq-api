@@ -8,7 +8,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Helper;
 use App\Models\Business;
+use App\Models\Analytics;
 
 class BusinessController extends Controller
 {
@@ -62,7 +64,8 @@ class BusinessController extends Controller
      *      }
      *
      */
-    public function search(){
+    public function search()
+    {
         $business = Business::searchBusiness($_GET);
         return json_encode($business);
     }
@@ -95,8 +98,77 @@ class BusinessController extends Controller
      *      }
      *
      */
-    public function searchSuggest($keyword){
+    public function searchSuggest($keyword)
+    {
         $businesses = Business::searchSuggest($keyword);
         return json_encode($businesses);
+    }
+
+    /**
+     * @api {get} analytics/business/{business_id}/{date_start}/{date_end} Retrieve Business Analytics.
+     * @apiName BusinessAnalyticsRetrieval
+     * @apiGroup Business
+     * @apiVersion 1.0.0
+     * @apiExample {js} Example Usage:
+     *     https://api.featherq.com/analytics/business/1/1449590400/1449676800
+     * @apiDescription Retrieve business analytics information
+     *
+     * @apiHeader {String} access-key The unique access key sent by the client.
+     * @apiPermission Authenticated Admin
+     *
+     * @apiParam {Number} business_id Unique ID of business to retrieve.
+     * @apiParam {Date} date_start Start date in which to query businesses. Format should be Unix timestamp.
+     * @apiParam {Date} end_date End date in which to query businesses. Format should be Unix timestamp.
+     *
+     * @apiSuccess (200) {Number} successProcess success/fail flag.
+     * @apiSuccess (200) {Number} total_numbers_issued Business count.
+     * @apiSuccess (200) {Number} total_numbers_called Array of business information.
+     * @apiSuccess (200) {Number} total_numbers_served User count.
+     * @apiSuccess (200) {Number} total_numbers_dropped Array of user details.
+     * @apiSuccess (200) {String} average_time_called Business queue information.
+     * @apiSuccess (200) {String} average_time_called Business queue information.
+     *
+     * @apiSuccessExample {Json} Success-Response:
+     *     HTTP/1.1 200 OK
+     *      {
+     *          "remaining_count": 0,
+     *          "total_numbers_issued": 2,
+     *          "total_numbers_called": 123,
+     *          "total_numbers_served": 1,
+     *          "total_numbers_dropped": 0,
+     *          "average_time_called": "",
+     *          "average_time_served": ""
+     *      }
+     *
+     * @apiError (Error) {Number} success Process fail flag.
+     * @apiError (Error) {String} err_code BusinessNotFound Business ID was not found.
+     * @apiError (Error) {String} err_code InvalidInput Invalid input.
+     *
+     * @apiErrorExample {Json} Error-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "success": 0,
+     *       "err_code": "Business does not exist"
+     *     }
+     */
+    public function businessAnalytics($business_id = null, $start_date = null, $end_date = null)
+    {
+        $business = Business::getBusinessByBusinessId($business_id);
+        if (is_null($business)) {
+            return json_encode(array(
+                'success' => 0,
+                'err_code' => 'BusinessNotFound'
+            ));
+        }
+
+        if (is_null($start_date) || is_null($end_date)) {
+            return json_encode(array(
+                'success' => 0,
+                'err_code' => 'InvalidInput'
+            ));
+        };
+
+        $analytics = Analytics::getBusinessAnalytics($business_id, $start_date, $end_date);
+        return json_encode($analytics);
     }
 }

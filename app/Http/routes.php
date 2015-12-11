@@ -53,7 +53,7 @@ $app->post('business/search', 'LandingPageController@search');
 $app->put('user/update', 'UserController@updateUser');
 
 // Analytics API
-//$app->get('analytics/business/{business_id}/{date_start}/{date_end}', 'AdminController@getBusinessnumbers');
+$app->get('analytics/business/{business_id}/{start_date}/{end_date}', 'BusinessController@businessAnalytics');//$app->get('analytics/business/{business_id}/{date_start}/{date_end}', 'AdminController@getBusinessnumbers');
 
 // Admin API
 $app->get('admin/list', 'AdminController@getAdmins');
