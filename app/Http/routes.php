@@ -53,7 +53,7 @@ $app->post('business/search', 'LandingPageController@search');
 $app->put('user/update', 'UserController@updateUser');
 
 // Analytics API
-//$app->get('analytics/business/{business_id}/{date_start}/{date_end}', 'AdminController@getBusinessnumbers');
+$app->get('analytics/business/{business_id}/{start_date}/{end_date}', 'BusinessController@businessAnalytics');
 
 // Admin API
 $app->get('admin/list', 'AdminController@getAdmins');
@@ -68,4 +68,3 @@ $app->post('admin/show-graph', 'AdminController@showGraph');
 // Layouts and Ads API
 $app->post('ads/upload/{business_id}', 'AdvertisementController@postUploadImage');
 $app->put('broadcast/update/{business_id}', 'BroadcastController@saveSettings');
-$app->get('analytics/business/{business_id}/{start_date}/{end_date}', 'BusinessController@businessAnalytics');
