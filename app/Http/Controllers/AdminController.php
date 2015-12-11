@@ -553,8 +553,11 @@ class AdminController extends Controller
                 ));
             }
 
-            $temp_start_date = $start_date;
-            $temp_end_date = $end_date;
+            $sd = strtotime($start_date);
+            $ed = strtotime($end_date);
+            // FIXME: we adjust the hours because timezone stored in database are in GMT+8
+            $temp_start_date = mktime(-8, 0, 0, date('m', $sd), date('d', $sd), date('Y', $sd));
+            $temp_end_date = mktime(-8, 0, 0, date('m', $ed), date('d', $ed), date('Y', $ed)) + 86400;
 
             if ($mode == "business") {
 
@@ -572,11 +575,11 @@ class AdminController extends Controller
                     for ($i = 0; $i < count($business); $i++) {
 
 
-                        $issued_count = Analytics::countNumbersByBusinessYmd($business[$i]->business_id, $temp_start_date, 0);
-                        $called_count = Analytics::countNumbersByBusinessYmd($business[$i]->business_id, $temp_start_date, 1);
-                        $served_count = Analytics::countNumbersByBusinessYmd($business[$i]->business_id, $temp_start_date, 2);
-                        $dropped_count = Analytics::countNumbersByBusinessYmd($business[$i]->business_id, $temp_start_date, 3);
-                        $issued_data_count = Analytics::countNumbersWithDataYmd($business[$i]->business_id, $temp_start_date);
+                        $issued_count = Analytics::countNumbersByBusiness($business[$i]->business_id, $temp_start_date, 0);
+                        $called_count = Analytics::countNumbersByBusiness($business[$i]->business_id, $temp_start_date, 1);
+                        $served_count = Analytics::countNumbersByBusiness($business[$i]->business_id, $temp_start_date, 2);
+                        $dropped_count = Analytics::countNumbersByBusiness($business[$i]->business_id, $temp_start_date, 3);
+                        $issued_data_count = Analytics::countNumbersWithData($business[$i]->business_id, $temp_start_date);
 
                         array_push($issued_numbers, $issued_count);
                         array_push($called_numbers, $called_count);
@@ -600,8 +603,6 @@ class AdminController extends Controller
 
             } else if ($mode == "industry") {
 
-                $business_id = Business::getBusinessIdsByIndustry($value);
-
                 $issued_numbers = [];
                 $called_numbers = [];
                 $served_numbers = [];
@@ -612,18 +613,17 @@ class AdminController extends Controller
 
                     $next_day = $temp_start_date + 86400;
 
-                    $issued_count = Analytics::countNumbersByIndustryYmd($business_id, $temp_start_date, 0);
-                    $called_count = Analytics::countNumbersByIndustryYmd($business_id, $temp_start_date, 1);
-                    $served_count = Analytics::countNumbersByIndustryYmd($business_id, $temp_start_date, 2);
-                    $dropped_count = Analytics::countNumbersByIndustryYmd($business_id, $temp_start_date, 3);
-                    $issued_data_count = Analytics::countIndustryNumbersWithDataYmd($business_id, $temp_start_date);
+                    $issued_count = Analytics::countNumbersByIndustry($value, $temp_start_date, 0);
+                    $called_count = Analytics::countNumbersByIndustry($value, $temp_start_date, 1);
+                    $served_count = Analytics::countNumbersByIndustry($value, $temp_start_date, 2);
+                    $dropped_count = Analytics::countNumbersByIndustry($value, $temp_start_date, 3);
+                    $issued_data_count = Analytics::countIndustryNumbersWithData($value, $temp_start_date);
 
                     array_push($issued_numbers, $issued_count);
                     array_push($called_numbers, $called_count);
                     array_push($served_numbers, $served_count);
                     array_push($dropped_numbers, $dropped_count);
                     array_push($issued_data_numbers, $issued_data_count);
-
                     $temp_start_date = $next_day;
                 }
 
@@ -638,8 +638,6 @@ class AdminController extends Controller
 
             } else if ($mode == "country") {
 
-                $business_id = Business::getBusinessIdsByCountry($value);
-
                 $issued_numbers = [];
                 $called_numbers = [];
                 $served_numbers = [];
@@ -650,11 +648,11 @@ class AdminController extends Controller
 
                     $next_day = $temp_start_date + 86400;
 
-                    $issued_count = Analytics::countNumbersByCountryYmd($business_id, $temp_start_date, 0);
-                    $called_count = Analytics::countNumbersByCountryYmd($business_id, $temp_start_date, 1);
-                    $served_count = Analytics::countNumbersByCountryYmd($business_id, $temp_start_date, 2);
-                    $dropped_count = Analytics::countNumbersByCountryYmd($business_id, $temp_start_date, 3);
-                    $issued_data_count = Analytics::countCountryNumbersWithDataYmd($business_id, $temp_start_date);
+                    $issued_count = Analytics::countNumbersByCountry($value, $temp_start_date, 0);
+                    $called_count = Analytics::countNumbersByCountry($value, $temp_start_date, 1);
+                    $served_count = Analytics::countNumbersByCountry($value, $temp_start_date, 2);
+                    $dropped_count = Analytics::countNumbersByCountry($value, $temp_start_date, 3);
+                    $issued_data_count = Analytics::countCountryNumbersWithData($value, $temp_start_date);
 
                     array_push($issued_numbers, $issued_count);
                     array_push($called_numbers, $called_count);
