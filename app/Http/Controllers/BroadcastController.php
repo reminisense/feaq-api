@@ -7,6 +7,7 @@ use App\Models\Business;
 use App\Models\AdImages;
 use App\Models\Service;
 use Illuminate\Support\Facades\Input;
+use \stdClass;
 
 class BroadcastController extends Controller
 {
