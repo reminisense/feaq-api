@@ -68,3 +68,4 @@ $app->post('admin/show-graph', 'AdminController@showGraph');
 // Layouts and Ads API
 $app->post('ads/upload/{business_id}', 'AdvertisementController@postUploadImage');
 $app->put('broadcast/update/{business_id}', 'BroadcastController@saveSettings');
+$app->get('analytics/business/{business_id}/{start_date}/{end_date}', 'BusinessController@businessAnalytics');
