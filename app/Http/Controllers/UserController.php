@@ -67,7 +67,7 @@ class UserController extends Controller
     }
     else {
       return json_encode(array(
-        'err_code' => 'NoUserFound',
+        'err_code' => 'UserNotFound',
       ));
     }
   }

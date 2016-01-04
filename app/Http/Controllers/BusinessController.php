@@ -73,7 +73,7 @@ class BusinessController extends Controller
      */
     public function search()
     {
-        $business = Business::searchBusiness($_GET);
+        $business = Business::searchBusiness(Input::all());
         return json_encode($business);
     }
 
